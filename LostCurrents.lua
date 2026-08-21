@@ -116,19 +116,22 @@ task.spawn(function()
     end
 end)
 
--- 3. Aura Collect (Phạm vi 200 mét)
+-- 3. Aura Collect Tối Ưu (Tránh quá tải, mượt mà, không bị lỗi)
 task.spawn(function()
     while true do
         if autoCollectActive then
             pcall(function()
                 local char = LocalPlayer.Character
                 if char and char:FindFirstChild("HumanoidRootPart") then
+                    local rootPos = char.HumanoidRootPart.Position
+                    
                     for _, item in ipairs(Workspace:GetDescendants()) do
                         if item:IsA("BasePart") and isTargetItem(item.Name) then
                             local isShop = (item.Parent and (item.Parent.Name:lower():find("shop") or item.Parent.Name:lower():find("merchant")))
                             if not isShop then
-                                local dist = (char.HumanoidRootPart.Position - item.Position).Magnitude
-                                if dist <= 200 then
+                                local dist = (rootPos - item.Position).Magnitude
+                                -- Giữ phạm vi hút hiệu quả trong tầm 70 mét để game và executor không bị ngợp lệnh
+                                if dist <= 70 then
                                     local prompt = item:FindFirstChildWhichIsA("ProximityPrompt")
                                     if prompt then
                                         prompt.HoldDuration = 0
@@ -137,6 +140,8 @@ task.spawn(function()
                                         item.CanCollide = false
                                         item.CFrame = char.HumanoidRootPart.CFrame
                                     end
+                                    -- Tạm nghỉ siêu ngắn giữa các item để không bị tràn bộ nhớ (crash)
+                                    task.wait(0.02)
                                 end
                             end
                         end
@@ -144,10 +149,9 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.1)
+        task.wait(0.2)
     end
 end)
-
 -- Sự kiện Bấm nút
 BtnESPItem.MouseButton1Click:Connect(function()
     espItemActive = not espItemActive
