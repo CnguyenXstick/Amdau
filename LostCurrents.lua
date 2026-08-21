@@ -5,144 +5,121 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
--- Danh sách vật phẩm
-local TargetItems = {"Gold", "Treasure", "Chest", "Gem", "Scrap", "Phế liệu", "Helmet", "Mũ bảo hiểm"}
-local function isTargetItem(name)
-    for _, v in ipairs(TargetItems) do
-        if name:lower() == v:lower() then return true end
-    end
-    return false
-end
-
--- Tạo Giao Diện UI Hiện đại
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-
-ScreenGui.Name = "LostCurrentsHub"
-ScreenGui.Parent = game.CoreGui
-
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
+-- UI Strawberry Hub
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name = "StrawberryHub"
+MainFrame.Size = UDim2.new(0, 220, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -210)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BackgroundTransparency = 0.2
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -150)
-MainFrame.Size = UDim2.new(0, 200, 0, 310)
-MainFrame.Active = true
 MainFrame.Draggable = true
-MainFrame.ClipsDescendants = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 
--- Tiêu đề và Logo
-Title.Name = "Title"
-Title.Parent = MainFrame
-Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+-- Viền 7 màu xoay
+local UIStroke = Instance.new("UIStroke", MainFrame)
+UIStroke.Thickness = 3
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.02 do
+            UIStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.05)
+        end
+    end
+end)
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Text = "Strawberry Hub"
 Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.new(1, 1, 1)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "   Lost Currents"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 14
-Title.TextXAlignment = Enum.TextXAlignment.Left
 
-local Logo = Instance.new("ImageLabel", Title)
-Logo.Size = UDim2.new(0, 25, 0, 25)
-Logo.Position = UDim2.new(0, 5, 0.15, 0)
-Logo.BackgroundTransparency = 1
-Logo.Image = "rbxassetid://88285387138547" 
-
-local function CreateButton(name, posY, defaultText)
-    local btn = Instance.new("TextButton")
-    btn.Name = name
-    btn.Parent = MainFrame
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.Position = UDim2.new(0.05, 0, posY, 0)
-    btn.Size = UDim2.new(0.9, 0, 0, 30)
-    btn.Font = Enum.Font.Gotham
-    btn.Text = defaultText .. ": OFF"
-    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    btn.TextSize = 12
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+-- Tạo nút bấm
+local function CreateBtn(text, pos)
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.Text = text; btn.Size = UDim2.new(0.8, 0, 0, 30)
+    btn.Position = UDim2.new(0.1, 0, pos, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
     return btn
 end
 
-local BtnESPItem = CreateButton("ESPItemBtn", 0.15, "ESP Item")
-local BtnESPShark = CreateButton("ESPSharkBtn", 0.26, "ESP Shark")
-local BtnAutoCollect = CreateButton("AutoCollectBtn", 0.37, "Aura Collect")
-local BtnSpeed = CreateButton("SpeedBtn", 0.48, "Speed")
-local BtnFly = CreateButton("FlyBtn", 0.59, "Fly")
-local BtnFullBright = CreateButton("FullBrightBtn", 0.70, "Full Bright")
+local SpeedInput = Instance.new("TextBox", MainFrame)
+SpeedInput.PlaceholderText = "Speed (50)"; SpeedInput.Size = UDim2.new(0.8, 0, 0, 30)
+SpeedInput.Position = UDim2.new(0.1, 0, 0.1, 0); SpeedInput.BackgroundColor3 = Color3.fromRGB(40,40,40)
 
-local espItemActive, espSharkActive, autoCollectActive, speedActive, flyActive, fullBrightActive = false, false, false, false, false, false
+local FlyBtn = CreateBtn("Fly: OFF", 0.25)
+local ESPBtn = CreateBtn("ESP Items: OFF", 0.35)
+local AutoCollectBtn = CreateBtn("Auto Collect: OFF", 0.45)
+local FullBrightBtn = CreateBtn("Full Bright: OFF", 0.55)
 
--- Chức năng hoạt động
-task.spawn(function()
-    while true do
-        if espItemActive then
-            pcall(function()
-                for _, item in ipairs(Workspace:GetDescendants()) do
-                    if item:IsA("BasePart") and isTargetItem(item.Name) and not item:FindFirstChild("ItemHighlight") then
-                        local highlight = Instance.new("Highlight", item)
-                        highlight.Name = "ItemHighlight"
-                        highlight.FillColor = Color3.fromRGB(255, 215, 0)
-                    end
-                end
-            end)
-        else
-            for _, item in ipairs(Workspace:GetDescendants()) do if item:FindFirstChild("ItemHighlight") then item.ItemHighlight:Destroy() end end
-        end
-        task.wait(2)
+local flyOn, espOn, collectOn, brightOn = false, false, false, false
+
+-- Chức năng
+FlyBtn.MouseButton1Click:Connect(function()
+    flyOn = not flyOn; FlyBtn.Text = "Fly: "..(flyOn and "ON" or "OFF")
+    local char = LocalPlayer.Character
+    if flyOn then
+        local bv = Instance.new("BodyVelocity", char.HumanoidRootPart); bv.Name = "FlyVel"
+        bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    else
+        if char.HumanoidRootPart:FindFirstChild("FlyVel") then char.HumanoidRootPart.FlyVel:Destroy() end
     end
 end)
 
-task.spawn(function()
-    while true do
-        if autoCollectActive then
-            pcall(function()
-                local char = LocalPlayer.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
-                    for _, item in ipairs(Workspace:GetDescendants()) do
-                        if item:IsA("BasePart") and isTargetItem(item.Name) then
-                            local dist = (char.HumanoidRootPart.Position - item.Position).Magnitude
-                            if dist <= 50 then
-                                local prompt = item:FindFirstChildWhichIsA("ProximityPrompt")
-                                if prompt then fireproximityprompt(prompt) else item.CFrame = char.HumanoidRootPart.CFrame end
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-        task.wait(0.1)
-    end
+ESPBtn.MouseButton1Click:Connect(function()
+    espOn = not espOn; ESPBtn.Text = "ESP Items: "..(espOn and "ON" or "OFF")
 end)
 
--- Nút bấm cập nhật trạng thái
-local function ToggleButton(btn, varName)
-    btn.MouseButton1Click:Connect(function()
-        if varName == "ESPItem" then espItemActive = not espItemActive; btn.Text = "ESP Item: " .. (espItemActive and "ON" or "OFF")
-        elseif varName == "ESPShark" then espSharkActive = not espSharkActive; btn.Text = "ESP Shark: " .. (espSharkActive and "ON" or "OFF")
-        elseif varName == "AutoCollect" then autoCollectActive = not autoCollectActive; btn.Text = "Aura Collect: " .. (autoCollectActive and "ON" or "OFF")
-        elseif varName == "Speed" then speedActive = not speedActive; btn.Text = "Speed: " .. (speedActive and "ON" or "OFF")
-        elseif varName == "Fly" then flyActive = not flyActive; btn.Text = "Fly: " .. (flyActive and "ON" or "OFF")
-        elseif varName == "FullBright" then fullBrightActive = not fullBrightActive; btn.Text = "Full Bright: " .. (fullBrightActive and "ON" or "OFF")
-        end
-    end)
-end
+AutoCollectBtn.MouseButton1Click:Connect(function()
+    collectOn = not collectOn; AutoCollectBtn.Text = "Auto Collect: "..(collectOn and "ON" or "OFF")
+end)
 
-ToggleButton(BtnESPItem, "ESPItem")
-ToggleButton(BtnESPShark, "ESPShark")
-ToggleButton(BtnAutoCollect, "AutoCollect")
-ToggleButton(BtnSpeed, "Speed")
-ToggleButton(BtnFly, "Fly")
-ToggleButton(BtnFullBright, "FullBright")
+FullBrightBtn.MouseButton1Click:Connect(function()
+    brightOn = not brightOn; FullBrightBtn.Text = "Full Bright: "..(brightOn and "ON" or "OFF")
+end)
 
--- Chạy bổ trợ (Speed, Fly, FullBright)
+-- Vòng lặp chính
 RunService.RenderStepped:Connect(function()
-    if speedActive then LocalPlayer.Character.Humanoid.WalkSpeed = 50 end
-    if fullBrightActive then Lighting.Brightness = 2; Lighting.ClockTime = 14 end
-    if flyActive then
+    if flyOn and LocalPlayer.Character:FindFirstChild("FlyVel") then
+        local speed = tonumber(SpeedInput.Text) or 50
         local cam = Workspace.CurrentCamera
-        local root = LocalPlayer.Character.HumanoidRootPart
-        root.Velocity = (UserInputService:IsKeyDown(Enum.KeyCode.W) and cam.CFrame.LookVector or Vector3.new()) * 50
+        local dir = Vector3.new(0,0,0)
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
+        LocalPlayer.Character.HumanoidRootPart.FlyVel.Velocity = dir * speed
+    end
+    if brightOn then Lighting.Brightness = 2; Lighting.ClockTime = 14 end
+end)
+
+-- ESP & Auto Collect
+task.spawn(function()
+    while true do
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and (obj.Name == "La bàn" or obj.Name == "Scrap") then
+                if espOn and not obj:FindFirstChild("Highlight") then Instance.new("Highlight", obj) end
+                if collectOn then
+                    local dist = (LocalPlayer.Character.HumanoidRootPart.Position - obj.Position).Magnitude
+                    if dist < 15 then obj.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame end
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- Auto TP lên ghế (Quét chữ Khí)
+task.spawn(function()
+    while true do
+        for _, gui in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
+            if gui:IsA("TextLabel") and string.find(gui.Text, "Khí") then
+                local val = tonumber(gui.Text:match("%d+"))
+                if val and val <= 10 then
+                    local seat = Workspace:FindFirstChild("Seat", true) or Workspace:FindFirstChild("VehicleSeat", true)
+                    if seat then LocalPlayer.Character.HumanoidRootPart.CFrame = seat.CFrame + Vector3.new(0, 2, 0) end
+                end
+            end
+        end
+        task.wait(0.5)
     end
 end)
