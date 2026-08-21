@@ -1,5 +1,8 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 -- Danh sách vật phẩm cần quét
@@ -12,7 +15,7 @@ local function isTargetItem(name)
     return false
 end
 
--- Tạo Giao Diện (UI)
+-- Tạo Giao Diện (UI) - Mở rộng khung để chứa 6 nút
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
@@ -24,8 +27,8 @@ ScreenGui.Parent = game.CoreGui
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Position = UDim2.new(0.5, -110, 0.5, -140)
-MainFrame.Size = UDim2.new(0, 220, 0, 200)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -195)
+MainFrame.Size = UDim2.new(0, 220, 0, 360)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
@@ -49,7 +52,7 @@ local function CreateButton(name, posY, defaultText)
     btn.Parent = MainFrame
     btn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     btn.Position = UDim2.new(0.1, 0, posY, 0)
-    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Size = UDim2.new(0.8, 0, 0, 35)
     btn.Font = Enum.Font.SourceSansBold
     btn.Text = defaultText .. ": OFF"
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -59,13 +62,25 @@ local function CreateButton(name, posY, defaultText)
     return btn
 end
 
-local BtnESPItem = CreateButton("ESPItemBtn", 0.25, "ESP Vật Phẩm")
-local BtnESPShark = CreateButton("ESPSharkBtn", 0.45, "ESP Cá Mập")
-local BtnAutoCollect = CreateButton("AutoCollectBtn", 0.65, "Aura Collect")
+local BtnESPItem = CreateButton("ESPItemBtn", 0.13, "ESP Vật Phẩm")
+local BtnESPShark = CreateButton("ESPSharkBtn", 0.26, "ESP Cá Mập")
+local BtnAutoCollect = CreateButton("AutoCollectBtn", 0.39, "Aura Collect")
+local BtnSpeed = CreateButton("SpeedBtn", 0.52, "Tốc Độ Chạy")
+local BtnFly = CreateButton("FlyBtn", 0.65, "Bay (Fly)")
+local BtnFullBright = CreateButton("FullBrightBtn", 0.78, "Full Bright")
 
 local espItemActive = false
 local espSharkActive = false
 local autoCollectActive = false
+local speedActive = false
+local flyActive = false
+local fullBrightActive = false
+
+-- Lưu lại giá trị ánh sáng gốc để khi tắt Full Bright có thể khôi phục
+local originalBrightness = Lighting.Brightness
+local originalClockTime = Lighting.ClockTime
+local originalFogEnd = Lighting.FogEnd
+local originalGlobalShadows = Lighting.GlobalShadows
 
 -- 1. ESP Vật phẩm
 task.spawn(function()
@@ -116,22 +131,19 @@ task.spawn(function()
     end
 end)
 
--- 3. Aura Collect Tối Ưu (Tránh quá tải, mượt mà, không bị lỗi)
+-- 3. Aura Collect
 task.spawn(function()
     while true do
         if autoCollectActive then
             pcall(function()
                 local char = LocalPlayer.Character
                 if char and char:FindFirstChild("HumanoidRootPart") then
-                    local rootPos = char.HumanoidRootPart.Position
-                    
                     for _, item in ipairs(Workspace:GetDescendants()) do
                         if item:IsA("BasePart") and isTargetItem(item.Name) then
                             local isShop = (item.Parent and (item.Parent.Name:lower():find("shop") or item.Parent.Name:lower():find("merchant")))
                             if not isShop then
-                                local dist = (rootPos - item.Position).Magnitude
-                                -- Giữ phạm vi hút hiệu quả trong tầm 70 mét để game và executor không bị ngợp lệnh
-                                if dist <= 70 then
+                                local dist = (char.HumanoidRootPart.Position - item.Position).Magnitude
+                                if dist <= 50 then
                                     local prompt = item:FindFirstChildWhichIsA("ProximityPrompt")
                                     if prompt then
                                         prompt.HoldDuration = 0
@@ -140,8 +152,6 @@ task.spawn(function()
                                         item.CanCollide = false
                                         item.CFrame = char.HumanoidRootPart.CFrame
                                     end
-                                    -- Tạm nghỉ siêu ngắn giữa các item để không bị tràn bộ nhớ (crash)
-                                    task.wait(0.02)
                                 end
                             end
                         end
@@ -149,9 +159,76 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.2)
+        task.wait(0.1)
     end
 end)
+
+-- 4. Tốc độ chạy (WalkSpeed)
+task.spawn(function()
+    while true do
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                if speedActive then
+                    char.Humanoid.WalkSpeed = 50
+                else
+                    char.Humanoid.WalkSpeed = 16
+                end
+            end
+        end)
+        task.wait(0.5)
+    end
+end)
+
+-- 5. Tính năng Bay (Fly)
+local flySpeed = 50
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+            local rootPart = char.HumanoidRootPart
+            local camera = Workspace.CurrentCamera
+            
+            if flyActive then
+                char.Humanoid.PlatformStand = true
+                local moveDir = Vector3.new(0, 0, 0)
+                
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + camera.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - camera.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
+                
+                rootPart.Velocity = moveDir * flySpeed
+            else
+                if char.Humanoid.PlatformStand then
+                    char.Humanoid.PlatformStand = false
+                end
+            end
+        end
+    end)
+end)
+
+-- 6. Tính năng Full Bright (Sáng toàn cục)
+task.spawn(function()
+    while true do
+        pcall(function()
+            if fullBrightActive then
+                Lighting.Brightness = 2
+                Lighting.ClockTime = 14 -- Cố định thời gian giữa trưa để luôn sáng
+                Lighting.FogEnd = 100000
+                Lighting.GlobalShadows = false
+            else
+                Lighting.Brightness = originalBrightness
+                Lighting.ClockTime = originalClockTime
+                Lighting.FogEnd = originalFogEnd
+                Lighting.GlobalShadows = originalGlobalShadows
+            end
+        end)
+        task.wait(1)
+    end
+end)
+
 -- Sự kiện Bấm nút
 BtnESPItem.MouseButton1Click:Connect(function()
     espItemActive = not espItemActive
@@ -169,4 +246,22 @@ BtnAutoCollect.MouseButton1Click:Connect(function()
     autoCollectActive = not autoCollectActive
     BtnAutoCollect.BackgroundColor3 = autoCollectActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
     BtnAutoCollect.Text = "Aura Collect: " .. (autoCollectActive and "ON" or "OFF")
+end)
+
+BtnSpeed.MouseButton1Click:Connect(function()
+    speedActive = not speedActive
+    BtnSpeed.BackgroundColor3 = speedActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
+    BtnSpeed.Text = "Tốc Độ Chạy: " .. (speedActive and "ON" or "OFF")
+end)
+
+BtnFly.MouseButton1Click:Connect(function()
+    flyActive = not flyActive
+    BtnFly.BackgroundColor3 = flyActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
+    BtnFly.Text = "Bay (Fly): " .. (flyActive and "ON" or "OFF")
+end)
+
+BtnFullBright.MouseButton1Click:Connect(function()
+    fullBrightActive = not fullBrightActive
+    BtnFullBright.BackgroundColor3 = fullBrightActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
+    BtnFullBright.Text = "Full Bright: " .. (fullBrightActive and "ON" or "OFF")
 end)
