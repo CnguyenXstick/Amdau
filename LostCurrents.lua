@@ -58,17 +58,16 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy() 
 end)
 
--- Tạo nút tròn thu nhỏ (Floating Button) có thể kéo thả khắp màn hình
-local FloatBtn = Instance.new("TextButton", ScreenGui)
+-- Nút tròn thu nhỏ dạng ảnh ID của bạn, có thể kéo thả khắp màn hình
+local FloatBtn = Instance.new("ImageButton", ScreenGui)
 FloatBtn.Name = "OpenButton"
 FloatBtn.Size = UDim2.new(0, 45, 0, 45)
 FloatBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
 FloatBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 FloatBtn.BackgroundTransparency = 0.3
-FloatBtn.Text = "🍓"
-FloatBtn.TextSize = 20
+FloatBtn.Image = "rbxassetid://88285387138547"
 FloatBtn.Visible = false
-FloatBtn.Draggable = true -- Cho phép kéo thả nút tròn khắp màn hình
+FloatBtn.Draggable = true
 Instance.new("UICorner", FloatBtn).CornerRadius = UDim.new(1, 0)
 
 -- Viền 7 màu cho nút tròn
@@ -145,7 +144,7 @@ RunService.RenderStepped:Connect(function(dt)
     end
 end)
 
--- AUTO LỤM & ESP (Độ trễ 0.3 ổn định)
+-- AUTO LỤM & ESP
 task.spawn(function()
     while true do
         pcall(function()
@@ -165,12 +164,13 @@ task.spawn(function()
                     -- Auto Lụm
                     if collectOn then
                         local dist = (rootPos - obj.Position).Magnitude
-                        if dist < 20 then
+                        if dist < 25 then
                             local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
                             if prompt then
+                                prompt.HoldDuration = 0
                                 fireproximityprompt(prompt)
                             else
-                                obj.CFrame = char.HumanoidRootPart.CFrame
+                                obj.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 1, 0)
                             end
                         end
                     end
@@ -181,14 +181,22 @@ task.spawn(function()
     end
 end)
 
--- Auto TP lên ghế ngay khi dính sát thương (mất máu liên tục do thiếu khí)
+-- Auto TP lên ghế (Chỉ TP 1 lần duy nhất khi dính sát thương, có chống lặp debounce)
+local isTeleported = false
 task.spawn(function()
     while true do
         pcall(function()
             local char = LocalPlayer.Character
             if char and char:FindFirstChildOfClass("Humanoid") then
                 local humanoid = char.Humanoid
-                if humanoid.Health < humanoid.MaxHealth and humanoid.Health > 0 then
+                
+                if humanoid.Health >= humanoid.MaxHealth then
+                    isTeleported = false
+                end
+                
+                if humanoid.Health < humanoid.MaxHealth and humanoid.Health > 0 and not isTeleported then
+                    isTeleported = true
+                    
                     local rootPart = char:FindFirstChild("HumanoidRootPart")
                     if rootPart then
                         local rootPos = rootPart.Position
