@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
--- Danh sách vật phẩm cần quét (Đã bao gồm Phế liệu và Mũ)
+-- Danh sách vật phẩm cần quét
 local TargetItems = {"Gold", "Treasure", "Chest", "Gem", "Scrap", "Phế liệu", "Helmet", "Mũ bảo hiểm"}
 
 local function isTargetItem(name)
@@ -116,7 +116,7 @@ task.spawn(function()
     end
 end)
 
--- 3. Aura Collect (Nhặt tức thì trong phạm vi)
+-- 3. Aura Collect (Phạm vi 200 mét)
 task.spawn(function()
     while true do
         if autoCollectActive then
@@ -128,7 +128,7 @@ task.spawn(function()
                             local isShop = (item.Parent and (item.Parent.Name:lower():find("shop") or item.Parent.Name:lower():find("merchant")))
                             if not isShop then
                                 local dist = (char.HumanoidRootPart.Position - item.Position).Magnitude
-                                if dist <= 50 then
+                                if dist <= 200 then
                                     local prompt = item:FindFirstChildWhichIsA("ProximityPrompt")
                                     if prompt then
                                         prompt.HoldDuration = 0
