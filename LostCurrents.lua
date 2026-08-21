@@ -1,7 +1,16 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
+
+-- Danh sách vật phẩm cần quét (Đã bao gồm Phế liệu và Mũ)
+local TargetItems = {"Gold", "Treasure", "Chest", "Gem", "Scrap", "Phế liệu", "Helmet", "Mũ bảo hiểm"}
+
+local function isTargetItem(name)
+    for _, v in ipairs(TargetItems) do
+        if name:lower() == v:lower() then return true end
+    end
+    return false
+end
 
 -- Tạo Giao Diện (UI)
 local ScreenGui = Instance.new("ScreenGui")
@@ -34,7 +43,6 @@ Title.TextSize = 16
 local titleCorner = Instance.new("UICorner")
 titleCorner.Parent = Title
 
--- Hàm tạo nút bấm
 local function CreateButton(name, posY, defaultText)
     local btn = Instance.new("TextButton")
     btn.Name = name
@@ -53,20 +61,19 @@ end
 
 local BtnESPItem = CreateButton("ESPItemBtn", 0.25, "ESP Vật Phẩm")
 local BtnESPShark = CreateButton("ESPSharkBtn", 0.45, "ESP Cá Mập")
-local BtnAutoCollect = CreateButton("AutoCollectBtn", 0.65, "Auto Lấy Đồ")
+local BtnAutoCollect = CreateButton("AutoCollectBtn", 0.65, "Aura Collect")
 
 local espItemActive = false
 local espSharkActive = false
 local autoCollectActive = false
 
--- 1. ESP Vật phẩm (Có loại trừ Shop)
+-- 1. ESP Vật phẩm
 task.spawn(function()
     while true do
         if espItemActive then
             pcall(function()
                 for _, item in ipairs(Workspace:GetDescendants()) do
-                    if item:IsA("BasePart") and (item.Name == "Gold" or item.Name == "Treasure" or item.Name == "Chest" or item.Name == "Gem") then
-                        -- Lọc bỏ vật phẩm ở khu vực Shop/Merchant
+                    if item:IsA("BasePart") and isTargetItem(item.Name) then
                         local isShop = (item.Parent and (item.Parent.Name:lower():find("shop") or item.Parent.Name:lower():find("merchant")))
                         if not isShop and not item:FindFirstChild("ItemHighlight") then
                             local highlight = Instance.new("Highlight")
@@ -109,31 +116,35 @@ task.spawn(function()
     end
 end)
 
--- 3. Auto Collect (Có lọc Shop)
+-- 3. Aura Collect (Nhặt tức thì trong phạm vi)
 task.spawn(function()
     while true do
         if autoCollectActive then
             pcall(function()
-                local character = LocalPlayer.Character
-                if character and character:FindFirstChild("HumanoidRootPart") then
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
                     for _, item in ipairs(Workspace:GetDescendants()) do
-                        if item:IsA("BasePart") and (item.Name == "Gold" or item.Name == "Treasure" or item.Name == "Chest" or item.Name == "Gem") then
+                        if item:IsA("BasePart") and isTargetItem(item.Name) then
                             local isShop = (item.Parent and (item.Parent.Name:lower():find("shop") or item.Parent.Name:lower():find("merchant")))
                             if not isShop then
-                                local prompt = item:FindFirstChildWhichIsA("ProximityPrompt")
-                                if prompt then
-                                    fireproximityprompt(prompt)
-                                else
-                                    character.HumanoidRootPart.CFrame = item.CFrame + Vector3.new(0, 2, 0)
+                                local dist = (char.HumanoidRootPart.Position - item.Position).Magnitude
+                                if dist <= 50 then
+                                    local prompt = item:FindFirstChildWhichIsA("ProximityPrompt")
+                                    if prompt then
+                                        prompt.HoldDuration = 0
+                                        fireproximityprompt(prompt)
+                                    else
+                                        item.CanCollide = false
+                                        item.CFrame = char.HumanoidRootPart.CFrame
+                                    end
                                 end
-                                task.wait(0.3)
                             end
                         end
                     end
                 end
             end)
         end
-        task.wait(1)
+        task.wait(0.1)
     end
 end)
 
@@ -153,5 +164,5 @@ end)
 BtnAutoCollect.MouseButton1Click:Connect(function()
     autoCollectActive = not autoCollectActive
     BtnAutoCollect.BackgroundColor3 = autoCollectActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
-    BtnAutoCollect.Text = "Auto Lấy Đồ: " .. (autoCollectActive and "ON" or "OFF")
+    BtnAutoCollect.Text = "Aura Collect: " .. (autoCollectActive and "ON" or "OFF")
 end)
