@@ -193,7 +193,7 @@ local function CreateButton(text, y, parent)
     return b
 end
 
--- TAB MAIN (Cấu hình Vận tốc Fly)
+-- TAB MAIN
 local FlySpeedInput = Instance.new("TextBox", MainContainer)
 FlySpeedInput.PlaceholderText = "Vận tốc Fly (VD: 50)"
 FlySpeedInput.Text = "50"
@@ -210,6 +210,7 @@ local ESPBtn = CreateButton("ESP: OFF", 0.54, MainContainer)
 -- TAB MISC
 local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer)
 local NoclipBtn = CreateButton("Noclip: OFF", 0.18, MiscContainer)
+local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.36, MiscContainer)
 
 -- TAB TELEPORT (TP)
 local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer)
@@ -241,7 +242,34 @@ CustomTPBtn.MouseButton1Click:Connect(function()
     if #coords >= 3 then TeleportTo(coords[1], coords[2], coords[3]) end
 end)
 
--- LOGIC FLY VẬN TỐC (BodyVelocity + BodyGyro)
+-- LOGIC FIX LAG
+FixLagBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 0
+        for _, v in pairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("BloomEffect") then
+                v.Enabled = false
+            end
+        end
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsA("MeshPart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.Reflectance = 0
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj:Destroy()
+            elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+                obj.Enabled = false
+            end
+        end
+    end)
+    FixLagBtn.Text = "Đã Fix Lag!"
+    task.wait(1.5)
+    FixLagBtn.Text = "Fix Lag (Boost FPS)"
+end)
+
+-- LOGIC FLY CHUẨN (KHÔNG BỊ BAY NGƯỢC)
 local flyBV, flyBG = nil, nil
 
 FlyBtn.MouseButton1Click:Connect(function()
@@ -275,12 +303,11 @@ FlyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Vòng lặp cập nhật vận tốc bay dựa trên Nút di chuyển & Camera
+-- Cập nhật hướng di chuyển theo Camera (Đã sửa lỗi bay ngược)
 RunService.RenderStepped:Connect(function()
     if flyOn and scriptRunning then
         local char = LocalPlayer.Character
         if char and char:FindFirstChild("HumanoidRootPart") then
-            local root = char.HumanoidRootPart
             local hum = char:FindFirstChildOfClass("Humanoid")
             local cam = Workspace.CurrentCamera
 
@@ -290,11 +317,25 @@ RunService.RenderStepped:Connect(function()
                 local moveDir = hum.MoveDirection
 
                 if moveDir.Magnitude > 0 then
-                    -- Tính toán hướng vận tốc chuẩn theo Camera
-                    local flyDir = (cam.CFrame.RightVector * moveDir.X) + (cam.CFrame.LookVector * -moveDir.Z)
+                    -- Nhân vector chuẩn để bay đúng hướng mặt nhìn
+                    local flyDir = (cam.CFrame.RightVector * moveDir.X) + (cam.CFrame.LookVector * moveDir.Z)
                     flyBV.velocity = flyDir.Unit * speed
                 else
                     flyBV.velocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+    end
+end)
+
+-- LOGIC NOCLIP CHUẨN (KHÔNG GIẬT KHỰNG)
+RunService.Stepped:Connect(function()
+    if noclipOn and scriptRunning then
+        local char = LocalPlayer.Character
+        if char then
+            for _, child in pairs(char:GetDescendants()) do
+                if child:IsA("BasePart") then
+                    child.CanCollide = false
                 end
             end
         end
@@ -348,18 +389,6 @@ BrightBtn.MouseButton1Click:Connect(function()
         Lighting.Ambient = Color3.new(1, 1, 1); Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
     else
         Lighting.Ambient = defaultAmbient; Lighting.OutdoorAmbient = defaultOutdoor
-    end
-end)
-
--- NOCLIP
-RunService.Stepped:Connect(function()
-    if noclipOn and scriptRunning then
-        local char = LocalPlayer.Character
-        if char then
-            for _, child in pairs(char:GetChildren()) do
-                if child:IsA("BasePart") then child.CanCollide = false end
-            end
-        end
     end
 end)
 
@@ -426,7 +455,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.2)
+        task.wait(0.3)
     end
 end)
 
@@ -462,6 +491,6 @@ task.spawn(function()
                 end
             end
         end)
-        task.wait(0.3)
+        task.wait(0.5)
     end
 end)
