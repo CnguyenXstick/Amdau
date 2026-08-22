@@ -8,26 +8,18 @@ local LocalPlayer = Players.LocalPlayer
 -- Biến quản lý trạng thái
 local scriptRunning = true
 local flyOn, collectOn, espOn, noclipOn, brightOn = false, false, false, false, false
-local tpwalking = false
 
--- Lưu trạng thái Lighting ban đầu để Restore
+-- Lưu trạng thái Lighting ban đầu
 local defaultAmbient = Lighting.Ambient
 local defaultOutdoor = Lighting.OutdoorAmbient
 
--- Danh sách tên vật phẩm ĐƯỢC PHÉP Auto Lụm (Tránh nhầm nút Kéo/Chèo thuyền)
+-- Danh sách vật phẩm Auto Lụm
 local LootNames = {
-    ["Scrap"] = true,
-    ["Gold"] = true,
-    ["Chest"] = true,
-    ["La bàn"] = true,
-    ["Compass"] = true,
-    ["Coin"] = true,
-    ["Loot"] = true,
-    ["Item"] = true,
-    ["Treasure"] = true
+    ["Scrap"] = true, ["Gold"] = true, ["Chest"] = true, ["La bàn"] = true,
+    ["Compass"] = true, ["Coin"] = true, ["Loot"] = true, ["Item"] = true, ["Treasure"] = true
 }
 
--- Hàm Kéo Thả
+-- Hàm Kéo Thả UI
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
     local function update(input)
@@ -132,10 +124,10 @@ end)
 HideBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; FloatBtn.Visible = true end)
 FloatBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatBtn.Visible = false end)
 
--- Tab Main & Misc
+-- Nút Chuyển Tab (Main / Misc / TP)
 local TabMainBtn = Instance.new("TextButton", MainFrame)
 TabMainBtn.Text = "Main"
-TabMainBtn.Size = UDim2.new(0.44, 0, 0, 22)
+TabMainBtn.Size = UDim2.new(0.28, 0, 0, 22)
 TabMainBtn.Position = UDim2.new(0.04, 0, 0.1, 0)
 TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
@@ -143,12 +135,21 @@ Instance.new("UICorner", TabMainBtn).CornerRadius = UDim.new(0, 4)
 
 local TabMiscBtn = Instance.new("TextButton", MainFrame)
 TabMiscBtn.Text = "Misc"
-TabMiscBtn.Size = UDim2.new(0.44, 0, 0, 22)
-TabMiscBtn.Position = UDim2.new(0.52, 0, 0.1, 0)
+TabMiscBtn.Size = UDim2.new(0.28, 0, 0, 22)
+TabMiscBtn.Position = UDim2.new(0.36, 0, 0.1, 0)
 TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 Instance.new("UICorner", TabMiscBtn).CornerRadius = UDim.new(0, 4)
 
+local TabTPBtn = Instance.new("TextButton", MainFrame)
+TabTPBtn.Text = "TP"
+TabTPBtn.Size = UDim2.new(0.28, 0, 0, 22)
+TabTPBtn.Position = UDim2.new(0.68, 0, 0.1, 0)
+TabTPBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TabTPBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+Instance.new("UICorner", TabTPBtn).CornerRadius = UDim.new(0, 4)
+
+-- Container Các Tab
 local MainContainer = Instance.new("Frame", MainFrame)
 MainContainer.Size = UDim2.new(0.92, 0, 0.82, 0)
 MainContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
@@ -160,17 +161,26 @@ MiscContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
 MiscContainer.BackgroundTransparency = 1
 MiscContainer.Visible = false
 
-TabMainBtn.MouseButton1Click:Connect(function()
-    MainContainer.Visible = true; MiscContainer.Visible = false
-    TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60); TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
-    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-end)
+local TPContainer = Instance.new("Frame", MainFrame)
+TPContainer.Size = UDim2.new(0.92, 0, 0.82, 0)
+TPContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
+TPContainer.BackgroundTransparency = 1
+TPContainer.Visible = false
 
-TabMiscBtn.MouseButton1Click:Connect(function()
-    MainContainer.Visible = false; MiscContainer.Visible = true
-    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60); TabMiscBtn.TextColor3 = Color3.new(1, 1, 1)
+local function SetTab(activeBtn, activeContainer)
+    MainContainer.Visible = false; MiscContainer.Visible = false; TPContainer.Visible = false
     TabMainBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMainBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-end)
+    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    TabTPBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabTPBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+
+    activeContainer.Visible = true
+    activeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    activeBtn.TextColor3 = Color3.new(1, 1, 1)
+end
+
+TabMainBtn.MouseButton1Click:Connect(function() SetTab(TabMainBtn, MainContainer) end)
+TabMiscBtn.MouseButton1Click:Connect(function() SetTab(TabMiscBtn, MiscContainer) end)
+TabTPBtn.MouseButton1Click:Connect(function() SetTab(TabTPBtn, TPContainer) end)
 
 local function CreateButton(text, y, parent)
     local b = Instance.new("TextButton", parent)
@@ -183,46 +193,128 @@ local function CreateButton(text, y, parent)
     return b
 end
 
-local SpeedInput = Instance.new("TextBox", MainContainer)
-SpeedInput.PlaceholderText = "Speed (Mặc định 1)"
-SpeedInput.Size = UDim2.new(1, 0, 0, 25)
-SpeedInput.Position = UDim2.new(0, 0, 0, 0)
-SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-SpeedInput.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 4)
+-- TAB MAIN (Cấu hình Vận tốc Fly)
+local FlySpeedInput = Instance.new("TextBox", MainContainer)
+FlySpeedInput.PlaceholderText = "Vận tốc Fly (VD: 50)"
+FlySpeedInput.Text = "50"
+FlySpeedInput.Size = UDim2.new(1, 0, 0, 25)
+FlySpeedInput.Position = UDim2.new(0, 0, 0, 0)
+FlySpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+FlySpeedInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", FlySpeedInput).CornerRadius = UDim.new(0, 4)
 
 local FlyBtn = CreateButton("Fly: OFF", 0.18, MainContainer)
 local CollectBtn = CreateButton("Auto Lụm: OFF", 0.36, MainContainer)
 local ESPBtn = CreateButton("ESP: OFF", 0.54, MainContainer)
+
+-- TAB MISC
 local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer)
 local NoclipBtn = CreateButton("Noclip: OFF", 0.18, MiscContainer)
 
--- HÀM DỌN SẠCH TOÀN BỘ (SỰ KIỆN NÚT X)
+-- TAB TELEPORT (TP)
+local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer)
+
+local CustomTPInput = Instance.new("TextBox", TPContainer)
+CustomTPInput.PlaceholderText = "X, Y, Z (VD: 100, 50, -200)"
+CustomTPInput.Size = UDim2.new(1, 0, 0, 25)
+CustomTPInput.Position = UDim2.new(0, 0, 0.18, 0)
+CustomTPInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+CustomTPInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
+
+local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.36, TPContainer)
+
+-- Logic TP
+local function TeleportTo(x, y, z)
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
+    end
+end
+
+SpecificTPBtn.MouseButton1Click:Connect(function() TeleportTo(1230, 220, 60) end)
+
+CustomTPBtn.MouseButton1Click:Connect(function()
+    local text = CustomTPInput.Text
+    local coords = {}
+    for num in string.gmatch(text, "[-?%d%.]+") do table.insert(coords, tonumber(num)) end
+    if #coords >= 3 then TeleportTo(coords[1], coords[2], coords[3]) end
+end)
+
+-- LOGIC FLY VẬN TỐC (BodyVelocity + BodyGyro)
+local flyBV, flyBG = nil, nil
+
+FlyBtn.MouseButton1Click:Connect(function()
+    flyOn = not flyOn
+    FlyBtn.Text = "Fly: "..(flyOn and "ON" or "OFF")
+
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+
+    if flyOn then
+        if root and hum then
+            flyBG = Instance.new("BodyGyro")
+            flyBG.P = 9e4
+            flyBG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+            flyBG.cframe = root.CFrame
+            flyBG.Parent = root
+
+            flyBV = Instance.new("BodyVelocity")
+            flyBV.velocity = Vector3.new(0, 0, 0)
+            flyBV.maxForce = Vector3.new(9e9, 9e9, 9e9)
+            flyBV.Parent = root
+
+            hum.PlatformStand = true
+        end
+    else
+        if flyBG then flyBG:Destroy() end
+        if flyBV then flyBV:Destroy() end
+        if hum then hum.PlatformStand = false end
+    end
+end)
+
+-- Vòng lặp cập nhật vận tốc bay dựa trên Nút di chuyển & Camera
+RunService.RenderStepped:Connect(function()
+    if flyOn and scriptRunning then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local root = char.HumanoidRootPart
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            local cam = Workspace.CurrentCamera
+
+            if flyBG and flyBV and hum then
+                flyBG.cframe = cam.CFrame
+                local speed = tonumber(FlySpeedInput.Text) or 50
+                local moveDir = hum.MoveDirection
+
+                if moveDir.Magnitude > 0 then
+                    -- Tính toán hướng vận tốc chuẩn theo Camera
+                    local flyDir = (cam.CFrame.RightVector * moveDir.X) + (cam.CFrame.LookVector * -moveDir.Z)
+                    flyBV.velocity = flyDir.Unit * speed
+                else
+                    flyBV.velocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+    end
+end)
+
+-- CLEANUP KHI TẮT GUI
 local function CleanupAll()
     scriptRunning = false
-    flyOn = false
-    collectOn = false
-    espOn = false
-    noclipOn = false
-    brightOn = false
-    tpwalking = false
+    flyOn = false; collectOn = false; espOn = false; noclipOn = false; brightOn = false
+
+    if flyBG then flyBG:Destroy() end
+    if flyBV then flyBV:Destroy() end
 
     Lighting.Ambient = defaultAmbient
     Lighting.OutdoorAmbient = defaultOutdoor
 
     local char = LocalPlayer.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.PlatformStand = false
-            for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
-                hum:SetStateEnabled(state, true)
-            end
-            hum:ChangeState(Enum.HumanoidStateType.Running)
-        end
-        if char:FindFirstChild("Animate") then
-            char.Animate.Disabled = false
-        end
+    if char and char:FindFirstChildOfClass("Humanoid") then
+        char.Humanoid.PlatformStand = false
     end
 
     for _, obj in pairs(Workspace:GetDescendants()) do
@@ -234,69 +326,6 @@ local function CleanupAll()
 end
 
 CloseBtn.MouseButton1Click:Connect(CleanupAll)
-
--- LOGIC FLY V3
-task.spawn(function()
-    while scriptRunning do
-        task.wait(0.1)
-        if flyOn and scriptRunning then
-            local char = LocalPlayer.Character
-            if not char then continue end
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            local root = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
-            if not hum or not root then continue end
-
-            if char:FindFirstChild("Animate") then char.Animate.Disabled = true end
-            for _, track in pairs(hum:GetPlayingAnimationTracks()) do track:AdjustSpeed(0) end
-
-            for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
-                hum:SetStateEnabled(state, false)
-            end
-            hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
-            hum:ChangeState(Enum.HumanoidStateType.Swimming)
-            hum.PlatformStand = true
-
-            local bg = Instance.new("BodyGyro", root)
-            bg.P = 9e4; bg.maxTorque = Vector3.new(9e9, 9e9, 9e9); bg.cframe = root.CFrame
-
-            local bv = Instance.new("BodyVelocity", root)
-            bv.velocity = Vector3.new(0, 0.1, 0); bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-
-            tpwalking = true
-            task.spawn(function()
-                local hb = RunService.Heartbeat
-                while tpwalking and flyOn and scriptRunning and char and hum and hum.Parent do
-                    hb:Wait()
-                    if hum.MoveDirection.Magnitude > 0 then
-                        local multiplier = tonumber(SpeedInput.Text) or 1
-                        for i = 1, math.max(1, math.floor(multiplier)) do
-                            char:TranslateBy(hum.MoveDirection)
-                        end
-                    end
-                end
-            end)
-
-            while flyOn and scriptRunning and hum.Health > 0 do
-                RunService.RenderStepped:Wait()
-                bg.cframe = Workspace.CurrentCamera.CFrame
-            end
-
-            tpwalking = false
-            bg:Destroy(); bv:Destroy()
-            hum.PlatformStand = false
-            if char:FindFirstChild("Animate") then char.Animate.Disabled = false end
-            for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
-                hum:SetStateEnabled(state, true)
-            end
-            hum:ChangeState(Enum.HumanoidStateType.Running)
-        end
-    end
-end)
-
-FlyBtn.MouseButton1Click:Connect(function()
-    flyOn = not flyOn
-    FlyBtn.Text = "Fly: "..(flyOn and "ON" or "OFF")
-end)
 
 CollectBtn.MouseButton1Click:Connect(function() collectOn = not collectOn; CollectBtn.Text = "Auto Lụm: "..(collectOn and "ON" or "OFF") end)
 NoclipBtn.MouseButton1Click:Connect(function() noclipOn = not noclipOn; NoclipBtn.Text = "Noclip: "..(noclipOn and "ON" or "OFF") end)
@@ -316,11 +345,9 @@ BrightBtn.MouseButton1Click:Connect(function()
     brightOn = not brightOn
     BrightBtn.Text = "Full Bright: "..(brightOn and "ON" or "OFF")
     if brightOn then
-        Lighting.Ambient = Color3.new(1, 1, 1)
-        Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+        Lighting.Ambient = Color3.new(1, 1, 1); Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
     else
-        Lighting.Ambient = defaultAmbient
-        Lighting.OutdoorAmbient = defaultOutdoor
+        Lighting.Ambient = defaultAmbient; Lighting.OutdoorAmbient = defaultOutdoor
     end
 end)
 
@@ -336,7 +363,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- ESP + AUTO LỤM (Đã lọc chính xác vật phẩm Loot)
+-- ESP + AUTO LỤM
 task.spawn(function()
     while scriptRunning do
         if espOn or collectOn then
@@ -385,7 +412,7 @@ task.spawn(function()
                             bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
                         end
                         
-                        -- Auto Lụm (Chỉ kích hoạt trên vật phẩm Loot)
+                        -- Auto Lụm
                         if collectOn and isTarget and dist <= 15 then
                             local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
                             if prompt then
