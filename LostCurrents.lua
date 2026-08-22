@@ -9,7 +9,7 @@ local LocalPlayer = Players.LocalPlayer
 local scriptRunning = true
 local flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
 
--- Trạng thái & Giá trị cấu hình bổ sung (Misc)
+-- Trạng thái & Giá trị cấu hình (Misc)
 local speedOn = false
 local speedValue = 32
 
@@ -18,6 +18,9 @@ local jumpValue = 100
 
 local boatSpeedOn = false
 local boatSpeedValue = 150
+
+local noFuelBoatOn = false
+local boatStepSpeed = 3
 
 local defaultAmbient = Lighting.Ambient
 local defaultOutdoor = Lighting.OutdoorAmbient
@@ -28,6 +31,28 @@ local LootNames = {
     ["Thùng"] = true, ["Thung"] = true, ["Barrel"] = true, ["Crate"] = true, ["Box"] = true,
     ["Dây"] = true, ["Day"] = true, ["Rope"] = true, ["String"] = true, ["Cable"] = true
 }
+
+-- ========================================================
+-- BẢO VỆ 1: HOOK CHẶN REMOTEEVENT TRỪ NHIÊN LIỆU (AUTO-RUN)
+-- ========================================================
+pcall(function()
+    local rawmetatable = getrawmetatable(game)
+    local oldNamecall = rawmetatable.__namecall
+    setreadonly(rawmetatable, false)
+
+    rawmetatable.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        if method == "FireServer" and self then
+            local name = string.lower(self.Name)
+            -- Chặn tất cả Remote gửi dữ liệu hao nhiên liệu
+            if name:find("fuel") or name:find("gas") or name:find("consume") or name:find("xang") or name:find("drain") then
+                return nil 
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(rawmetatable, true)
+end)
 
 -- Hàm Kéo Thả UI
 local function MakeDraggable(gui)
@@ -63,8 +88,8 @@ ScreenGui.Parent = game:GetService("CoreGui")
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 450, 0, 260)
-MainFrame.Position = UDim2.new(0.5, -225, 0.5, -130)
+MainFrame.Size = UDim2.new(0, 450, 0, 270)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -135)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BackgroundTransparency = 0.3
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
@@ -189,7 +214,7 @@ TabTPBtn.MouseButton1Click:Connect(function() SetTab(TabTPBtn, TPContainer) end)
 local function CreateButton(text, y, parent, widthScale, xPos)
     local b = Instance.new("TextButton", parent)
     b.Text = text
-    b.Size = UDim2.new(widthScale or 1, 0, 0, 25)
+    b.Size = UDim2.new(widthScale or 1, 0, 0, 24)
     b.Position = UDim2.new(xPos or 0, 0, y, 0)
     b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     b.TextColor3 = Color3.new(1, 1, 1)
@@ -201,7 +226,7 @@ end
 local FlySpeedInput = Instance.new("TextBox", MainContainer)
 FlySpeedInput.PlaceholderText = "Vận tốc Fly (VD: 50)"
 FlySpeedInput.Text = "50"
-FlySpeedInput.Size = UDim2.new(0.48, 0, 0, 25)
+FlySpeedInput.Size = UDim2.new(0.48, 0, 0, 24)
 FlySpeedInput.Position = UDim2.new(0, 0, 0, 0)
 FlySpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 FlySpeedInput.TextColor3 = Color3.new(1, 1, 1)
@@ -212,30 +237,69 @@ local FlyBtn = CreateButton("Fly: OFF", 0, MainContainer, 0.48, 0.52)
 local KillDistInput = Instance.new("TextBox", MainContainer)
 KillDistInput.PlaceholderText = "Tầm Kill Aura (VD: 25)"
 KillDistInput.Text = "25"
-KillDistInput.Size = UDim2.new(0.48, 0, 0, 25)
-KillDistInput.Position = UDim2.new(0, 0, 0.16, 0)
+KillDistInput.Size = UDim2.new(0.48, 0, 0, 24)
+KillDistInput.Position = UDim2.new(0, 0, 0.14, 0)
 KillDistInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 KillDistInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", KillDistInput).CornerRadius = UDim.new(0, 4)
 
-local KillAuraBtn = CreateButton("Kill Aura: OFF", 0.16, MainContainer, 0.48, 0.52)
-local CollectBtn = CreateButton("Auto Lụm: OFF", 0.32, MainContainer, 0.48, 0)
-local ESPBtn = CreateButton("ESP Item: OFF", 0.32, MainContainer, 0.48, 0.52)
-local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.48, MainContainer, 1, 0)
+local KillAuraBtn = CreateButton("Kill Aura: OFF", 0.14, MainContainer, 0.48, 0.52)
+local CollectBtn = CreateButton("Auto Lụm: OFF", 0.28, MainContainer, 0.48, 0)
+local ESPBtn = CreateButton("ESP Item: OFF", 0.28, MainContainer, 0.48, 0.52)
+local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.42, MainContainer, 1, 0)
 
 -- TAB MISC
 local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer, 1, 0)
-local NoclipBtn = CreateButton("Noclip: OFF", 0.14, MiscContainer, 1, 0)
-local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.28, MiscContainer, 1, 0)
+local NoclipBtn = CreateButton("Noclip: OFF", 0.13, MiscContainer, 1, 0)
+local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.26, MiscContainer, 1, 0)
 
-local SpeedBtn = CreateButton("WalkSpeed ("..speedValue.."): OFF", 0.42, MiscContainer, 1, 0)
-local JumpBtn = CreateButton("JumpPower ("..jumpValue.."): OFF", 0.56, MiscContainer, 1, 0)
-local BoatSpeedBtn = CreateButton("Boat Speed ("..boatSpeedValue.."): OFF", 0.70, MiscContainer, 1, 0)
+-- WalkSpeed
+local SpeedInput = Instance.new("TextBox", MiscContainer)
+SpeedInput.PlaceholderText = "Tốc độ chạy"
+SpeedInput.Text = tostring(speedValue)
+SpeedInput.Size = UDim2.new(0.48, 0, 0, 24)
+SpeedInput.Position = UDim2.new(0, 0, 0.39, 0)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 4)
+
+local SpeedBtn = CreateButton("WalkSpeed: OFF", 0.39, MiscContainer, 0.48, 0.52)
+
+-- JumpPower
+local JumpInput = Instance.new("TextBox", MiscContainer)
+JumpInput.PlaceholderText = "Lực nhảy"
+JumpInput.Text = tostring(jumpValue)
+JumpInput.Size = UDim2.new(0.48, 0, 0, 24)
+JumpInput.Position = UDim2.new(0, 0, 0.52, 0)
+JumpInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+JumpInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", JumpInput).CornerRadius = UDim.new(0, 4)
+
+local JumpBtn = CreateButton("JumpPower: OFF", 0.52, MiscContainer, 0.48, 0.52)
+
+-- Boat Speed
+local BoatInput = Instance.new("TextBox", MiscContainer)
+BoatInput.PlaceholderText = "Tốc độ thuyền"
+BoatInput.Text = tostring(boatSpeedValue)
+BoatInput.Size = UDim2.new(0.48, 0, 0, 24)
+BoatInput.Position = UDim2.new(0, 0, 0.65, 0)
+BoatInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+BoatInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", BoatInput).CornerRadius = UDim.new(0, 4)
+
+local BoatSpeedBtn = CreateButton("Boat Speed: OFF", 0.65, MiscContainer, 0.48, 0.52)
+
+-- No-Fuel Drive
+local NoFuelBtn = CreateButton("Lái Không Mất Xăng: OFF", 0.78, MiscContainer, 1, 0)
+
+-- Cập nhật thông số từ TextBox
+SpeedInput.FocusLost:Connect(function() local v = tonumber(SpeedInput.Text); if v then speedValue = v else SpeedInput.Text = tostring(speedValue) end end)
+JumpInput.FocusLost:Connect(function() local v = tonumber(JumpInput.Text); if v then jumpValue = v else JumpInput.Text = tostring(jumpValue) end end)
+BoatInput.FocusLost:Connect(function() local v = tonumber(BoatInput.Text); if v then boatSpeedValue = v else BoatInput.Text = tostring(boatSpeedValue) end end)
 
 SpeedBtn.MouseButton1Click:Connect(function() 
     speedOn = not speedOn 
-    SpeedBtn.Text = "WalkSpeed ("..speedValue.."): "..(speedOn and "ON" or "OFF") 
-     
+    SpeedBtn.Text = "WalkSpeed: "..(speedOn and "ON" or "OFF") 
     if not speedOn and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then 
         LocalPlayer.Character.Humanoid.WalkSpeed = 16 
     end 
@@ -243,8 +307,7 @@ end)
 
 JumpBtn.MouseButton1Click:Connect(function() 
     jumpOn = not jumpOn 
-    JumpBtn.Text = "JumpPower ("..jumpValue.."): "..(jumpOn and "ON" or "OFF") 
-     
+    JumpBtn.Text = "JumpPower: "..(jumpOn and "ON" or "OFF") 
     if not jumpOn and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then 
         LocalPlayer.Character.Humanoid.UseJumpPower = true 
         LocalPlayer.Character.Humanoid.JumpPower = 50 
@@ -253,22 +316,27 @@ end)
 
 BoatSpeedBtn.MouseButton1Click:Connect(function() 
     boatSpeedOn = not boatSpeedOn 
-    BoatSpeedBtn.Text = "Boat Speed ("..boatSpeedValue.."): "..(boatSpeedOn and "ON" or "OFF") 
+    BoatSpeedBtn.Text = "Boat Speed: "..(boatSpeedOn and "ON" or "OFF") 
+end)
+
+NoFuelBtn.MouseButton1Click:Connect(function()
+    noFuelBoatOn = not noFuelBoatOn
+    NoFuelBtn.Text = "Lái Không Mất Xăng: "..(noFuelBoatOn and "ON" or "OFF")
 end)
 
 -- TAB TELEPORT
 local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer, 1, 0)
-local PirateBaseBtn = CreateButton("Base hải tặc", 0.16, TPContainer, 1, 0)
+local PirateBaseBtn = CreateButton("Base hải tặc", 0.14, TPContainer, 1, 0)
 
 local CustomTPInput = Instance.new("TextBox", TPContainer)
 CustomTPInput.PlaceholderText = "X, Y, Z (VD: 100, 50, -200)"
-CustomTPInput.Size = UDim2.new(1, 0, 0, 25)
-CustomTPInput.Position = UDim2.new(0, 0, 0.32, 0)
+CustomTPInput.Size = UDim2.new(1, 0, 0, 24)
+CustomTPInput.Position = UDim2.new(0, 0, 0.28, 0)
 CustomTPInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 CustomTPInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
 
-local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.48, TPContainer, 1, 0)
+local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.42, TPContainer, 1, 0)
 
 local function TeleportTo(x, y, z)
     local char = LocalPlayer.Character
@@ -464,7 +532,7 @@ end
 local function CleanupAll()
     scriptRunning = false
     flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
-    speedOn, jumpOn, boatSpeedOn = false, false, false
+    speedOn, jumpOn, boatSpeedOn, noFuelBoatOn = false, false, false, false
 
     StopFly()
 
@@ -660,33 +728,39 @@ task.spawn(function()
     end
 end)
 
--- VÒNG LẶP XỬ LÝ ĐƯỢC THÊM VÀO
--- Loop 1: Xử lý Tốc độ thuyền (Boat Speed)
+-- Loop 1: Tốc độ thuyền vật lý (BodyVelocity)
 task.spawn(function() 
     while scriptRunning do 
-        if boatSpeedOn then 
-            pcall(function() 
-                local char = LocalPlayer.Character 
-                if char and char:FindFirstChild("Humanoid") then 
-                    local seat = char.Humanoid.SeatPart 
-                    if seat and seat:IsA("VehicleSeat") then 
-                        seat.MaxSpeed = boatSpeedValue 
-                         
+        pcall(function() 
+            local char = LocalPlayer.Character 
+            if char and char:FindFirstChild("Humanoid") then 
+                local seat = char.Humanoid.SeatPart 
+                if seat and seat:IsA("VehicleSeat") then 
+                    local bv = seat:FindFirstChild("BoatSpeedBV")
+                    if boatSpeedOn and not noFuelBoatOn then
+                        if not bv then
+                            bv = Instance.new("BodyVelocity")
+                            bv.Name = "BoatSpeedBV"
+                            bv.MaxForce = Vector3.new(9e5, 0, 9e5)
+                            bv.Parent = seat
+                        end
+                        seat.MaxSpeed = boatSpeedValue
                         if seat.Throttle ~= 0 then 
-                            local currentY = seat.AssemblyLinearVelocity.Y 
-                            local targetVelocity = seat.CFrame.LookVector * (seat.Throttle * boatSpeedValue) 
-                             
-                            seat.AssemblyLinearVelocity = Vector3.new(targetVelocity.X, currentY, targetVelocity.Z) 
-                        end 
-                    end 
+                            bv.Velocity = seat.CFrame.LookVector * (seat.Throttle * boatSpeedValue)
+                        else
+                            bv.Velocity = Vector3.new(0, 0, 0)
+                        end
+                    else
+                        if bv then bv:Destroy() end
+                    end
                 end 
-            end) 
-        end 
-        task.wait(0.02) 
+            end 
+        end) 
+        task.wait(0.05) 
     end 
 end) 
 
--- Loop 2: Xử lý WalkSpeed / JumpPower nhân vật
+-- Loop 2: Tốc độ chạy & Lực nhảy
 task.spawn(function() 
     while scriptRunning do 
         pcall(function() 
@@ -703,4 +777,34 @@ task.spawn(function()
         end) 
         task.wait(0.1) 
     end 
+end)
+
+-- BẢO VỆ 2: DI CHUYỂN BẰNG CFRAME (LÁI KHÔNG MẤT XĂNG)
+task.spawn(function()
+    while scriptRunning do
+        if noFuelBoatOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    local seat = char.Humanoid.SeatPart
+                    if seat and seat:IsA("VehicleSeat") then
+                        local boatModel = seat:FindFirstAncestorOfClass("Model") or seat
+                        
+                        -- Di chuyển tiến / lùi
+                        if seat.Throttle > 0 then
+                            boatModel:PivotTo(boatModel:GetPivot() + (seat.CFrame.LookVector * (boatStepSpeed * (boatSpeedValue / 50))))
+                        elseif seat.Throttle < 0 then
+                            boatModel:PivotTo(boatModel:GetPivot() - (seat.CFrame.LookVector * (boatStepSpeed * (boatSpeedValue / 50))))
+                        end
+                        
+                        -- Xoay hướng
+                        if seat.Steer ~= 0 then
+                            boatModel:PivotTo(boatModel:GetPivot() * CFrame.Angles(0, math.rad(-seat.Steer * 3), 0))
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.03)
+    end
 end)
