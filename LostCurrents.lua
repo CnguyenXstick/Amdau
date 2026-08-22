@@ -7,16 +7,18 @@ local LocalPlayer = Players.LocalPlayer
 
 -- Biến quản lý trạng thái
 local scriptRunning = true
-local flyOn, collectOn, espOn, noclipOn, brightOn = false, false, false, false, false
+local flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
 
 -- Lưu trạng thái Lighting ban đầu
 local defaultAmbient = Lighting.Ambient
 local defaultOutdoor = Lighting.OutdoorAmbient
 
--- Danh sách vật phẩm Auto Lụm
+-- Danh sách vật phẩm Auto Lụm & ESP
 local LootNames = {
     ["Scrap"] = true, ["Gold"] = true, ["Chest"] = true, ["La bàn"] = true,
-    ["Compass"] = true, ["Coin"] = true, ["Loot"] = true, ["Item"] = true, ["Treasure"] = true
+    ["Compass"] = true, ["Coin"] = true, ["Loot"] = true, ["Item"] = true, ["Treasure"] = true,
+    ["Thùng"] = true, ["Thung"] = true, ["Barrel"] = true, ["Crate"] = true, ["Box"] = true,
+    ["Dây"] = true, ["Day"] = true, ["Rope"] = true, ["String"] = true, ["Cable"] = true
 }
 
 -- Hàm Kéo Thả UI
@@ -53,8 +55,8 @@ end
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Name = "StrawberryHub"
-MainFrame.Size = UDim2.new(0, 220, 0, 270)
-MainFrame.Position = UDim2.new(0.5, -110, 0.5, -135)
+MainFrame.Size = UDim2.new(0, 220, 0, 330)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -165)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BackgroundTransparency = 0.3
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
@@ -203,22 +205,35 @@ FlySpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 FlySpeedInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", FlySpeedInput).CornerRadius = UDim.new(0, 4)
 
-local FlyBtn = CreateButton("Fly: OFF", 0.18, MainContainer)
-local CollectBtn = CreateButton("Auto Lụm: OFF", 0.36, MainContainer)
-local ESPBtn = CreateButton("ESP: OFF", 0.54, MainContainer)
+local FlyBtn = CreateButton("Fly: OFF", 0.12, MainContainer)
+
+local KillDistInput = Instance.new("TextBox", MainContainer)
+KillDistInput.PlaceholderText = "Tầm Kill Aura (VD: 25)"
+KillDistInput.Text = "25"
+KillDistInput.Size = UDim2.new(1, 0, 0, 25)
+KillDistInput.Position = UDim2.new(0, 0, 0.24, 0)
+KillDistInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KillDistInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", KillDistInput).CornerRadius = UDim.new(0, 4)
+
+local KillAuraBtn = CreateButton("Kill Aura: OFF", 0.36, MainContainer)
+local CollectBtn = CreateButton("Auto Lụm: OFF", 0.48, MainContainer)
+local ESPBtn = CreateButton("ESP Item: OFF", 0.60, MainContainer)
+local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.72, MainContainer)
 
 -- TAB MISC
 local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer)
-local NoclipBtn = CreateButton("Noclip: OFF", 0.18, MiscContainer)
-local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.36, MiscContainer)
+local NoclipBtn = CreateButton("Noclip: OFF", 0.12, MiscContainer)
+local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.24, MiscContainer)
 
 -- TAB TELEPORT (TP)
 local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer)
+local PirateBaseBtn = CreateButton("Base hải tặc", 0.12, TPContainer)
 
 local CustomTPInput = Instance.new("TextBox", TPContainer)
 CustomTPInput.PlaceholderText = "X, Y, Z (VD: 100, 50, -200)"
 CustomTPInput.Size = UDim2.new(1, 0, 0, 25)
-CustomTPInput.Position = UDim2.new(0, 0, 0.18, 0)
+CustomTPInput.Position = UDim2.new(0, 0, 0.24, 0)
 CustomTPInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 CustomTPInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
@@ -234,6 +249,7 @@ local function TeleportTo(x, y, z)
 end
 
 SpecificTPBtn.MouseButton1Click:Connect(function() TeleportTo(1230, 220, 60) end)
+PirateBaseBtn.MouseButton1Click:Connect(function() TeleportTo(-2500, 250, -1500) end)
 
 CustomTPBtn.MouseButton1Click:Connect(function()
     local text = CustomTPInput.Text
@@ -269,26 +285,19 @@ FixLagBtn.MouseButton1Click:Connect(function()
     FixLagBtn.Text = "Fix Lag (Boost FPS)"
 end)
 
--- LOGIC FLY BẰNG NÚT DI CHUYỂN
+-- LOGIC FLY
 local flyBV, flyBG = nil, nil
 local upPressed, downPressed = false, false
 
--- Lắng nghe phím Bay Lên / Bay Xuống (Bàn phím PC)
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
-    if input.KeyCode == Enum.KeyCode.Space then
-        upPressed = true
-    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then
-        downPressed = true
-    end
+    if input.KeyCode == Enum.KeyCode.Space then upPressed = true
+    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then downPressed = true end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.Space then
-        upPressed = false
-    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then
-        downPressed = false
-    end
+    if input.KeyCode == Enum.KeyCode.Space then upPressed = false
+    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then downPressed = false end
 end)
 
 FlyBtn.MouseButton1Click:Connect(function()
@@ -302,16 +311,14 @@ FlyBtn.MouseButton1Click:Connect(function()
 
     if flyOn then
         if root and hum then
-            flyBG = Instance.new("BodyGyro")
+            flyBG = Instance.new("BodyGyro", root)
             flyBG.P = 9e4
             flyBG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
             flyBG.cframe = root.CFrame
-            flyBG.Parent = root
 
-            flyBV = Instance.new("BodyVelocity")
+            flyBV = Instance.new("BodyVelocity", root)
             flyBV.velocity = Vector3.new(0, 0, 0)
             flyBV.maxForce = Vector3.new(9e9, 9e9, 9e9)
-            flyBV.Parent = root
 
             hum.PlatformStand = true
         end
@@ -322,7 +329,6 @@ FlyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- RenderStepped: Đọc trực tiếp phím/joystick đang bấm
 RunService.RenderStepped:Connect(function()
     if flyOn and scriptRunning then
         local char = LocalPlayer.Character
@@ -333,55 +339,82 @@ RunService.RenderStepped:Connect(function()
             if flyBG and flyBV and hum then
                 flyBG.cframe = cam.CFrame
                 local speed = tonumber(FlySpeedInput.Text) or 50
-                local moveDir = hum.MoveDirection -- Lấy hướng từ phím WASD / Joystick Điện thoại
+                local moveDir = hum.MoveDirection
 
-                local targetVelocity = Vector3.new(0, 0, 0)
-
-                -- Tính toán hướng di chuyển ngang/dọc theo Camera
-                if moveDir.Magnitude > 0 then
-                    targetVelocity = cam.CFrame:VectorToWorldSpace(CFrame.new(rootPosition or Vector3.new(), rootPosition or Vector3.new()):VectorToObjectSpace(moveDir)) * speed
-                    targetVelocity = (cam.CFrame.RightVector * (cam.CFrame.RightVector:Dot(moveDir * speed))) + (cam.CFrame.LookVector * (cam.CFrame.LookVector:Dot(moveDir * speed)))
-                end
-
-                -- Xử lý bay lên / hạ xuống
                 local verticalVelocity = 0
-                if upPressed then
-                    verticalVelocity = speed
-                elseif downPressed then
-                    verticalVelocity = -speed
-                end
+                if upPressed then verticalVelocity = speed
+                elseif downPressed then verticalVelocity = -speed end
 
-                -- Tạo độ nẩy/bay chuẩn theo hướng nhìn
                 if moveDir.Magnitude > 0 or upPressed or downPressed then
                     local finalDir = Vector3.new(0, 0, 0)
                     if moveDir.Magnitude > 0 then
-                        -- Lấy trực tiếp LookVector để hướng camera ngẩng lên/cúi xuống sẽ bay theo chiều đó
-                        local forwardVector = cam.CFrame.LookVector
-                        local rightVector = cam.CFrame.RightVector
-                        
-                        -- Chuyển MoveDirection sang hệ tọa độ Camera
                         local relativeMove = cam.CFrame:VectorToObjectSpace(moveDir)
-                        finalDir = (forwardVector * -relativeMove.Z) + (rightVector * relativeMove.X)
+                        finalDir = (cam.CFrame.LookVector * -relativeMove.Z) + (cam.CFrame.RightVector * relativeMove.X)
                     end
-                    
                     flyBV.velocity = (finalDir * speed) + Vector3.new(0, verticalVelocity, 0)
                 else
-                    flyBV.velocity = Vector3.new(0, 0, 0) -- Đứng yên lơ lửng khi không bấm nút
+                    flyBV.velocity = Vector3.new(0, 0, 0)
                 end
             end
         end
     end
 end)
 
--- LOGIC NOCLIP CHUẨN (KHÔNG GIẬT KHỰNG)
+-- LOGIC KILL AURA (TUỲ CHỈNH KHOẢNG CÁCH)
+KillAuraBtn.MouseButton1Click:Connect(function()
+    killAuraOn = not killAuraOn
+    KillAuraBtn.Text = "Kill Aura: "..(killAuraOn and "ON" or "OFF")
+end)
+
+task.spawn(function()
+    while scriptRunning do
+        if killAuraOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPos = char.HumanoidRootPart.Position
+
+                -- Lấy khoảng cách người dùng đã nhập
+                local maxDist = tonumber(KillDistInput.Text) or 25
+
+                -- Lấy vũ khí đang cầm trên tay
+                local equippedTool = char:FindFirstChildOfClass("Tool")
+
+                if equippedTool then
+                    for _, model in pairs(Workspace:GetDescendants()) do
+                        if model:IsA("Model") and model ~= char and model:FindFirstChildOfClass("Humanoid") then
+                            local hum = model:FindFirstChildOfClass("Humanoid")
+                            if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(model) then
+                                local npcRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
+                                if npcRoot then
+                                    local dist = (rootPos - npcRoot.Position).Magnitude
+                                    if dist <= maxDist then
+                                        equippedTool:Activate()
+                                        
+                                        local handle = equippedTool:FindFirstChild("Handle") or equippedTool:FindFirstChildWhichIsA("BasePart")
+                                        if handle then
+                                            firetouchinterest(handle, npcRoot, 0)
+                                            firetouchinterest(handle, npcRoot, 1)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- LOGIC NOCLIP
 RunService.Stepped:Connect(function()
     if noclipOn and scriptRunning then
         local char = LocalPlayer.Character
         if char then
             for _, child in pairs(char:GetDescendants()) do
-                if child:IsA("BasePart") then
-                    child.CanCollide = false
-                end
+                if child:IsA("BasePart") then child.CanCollide = false end
             end
         end
     end
@@ -390,7 +423,7 @@ end)
 -- CLEANUP KHI TẮT GUI
 local function CleanupAll()
     scriptRunning = false
-    flyOn = false; collectOn = false; espOn = false; noclipOn = false; brightOn = false
+    flyOn = false; collectOn = false; espOn = false; espNpcOn = false; killAuraOn = false; noclipOn = false; brightOn = false
 
     if flyBG then flyBG:Destroy() end
     if flyBV then flyBV:Destroy() end
@@ -399,13 +432,13 @@ local function CleanupAll()
     Lighting.OutdoorAmbient = defaultOutdoor
 
     local char = LocalPlayer.Character
-    if char and char:FindFirstChildOfClass("Humanoid") then
-        char.Humanoid.PlatformStand = false
-    end
+    if char and char:FindFirstChildOfClass("Humanoid") then char.Humanoid.PlatformStand = false end
 
     for _, obj in pairs(Workspace:GetDescendants()) do
         if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight:Destroy() end
         if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui:Destroy() end
+        if obj:FindFirstChild("NPCHighlight") then obj.NPCHighlight:Destroy() end
+        if obj:FindFirstChild("NPCTextGui") then obj.NPCTextGui:Destroy() end
     end
 
     ScreenGui:Destroy()
@@ -418,11 +451,22 @@ NoclipBtn.MouseButton1Click:Connect(function() noclipOn = not noclipOn; NoclipBt
 
 ESPBtn.MouseButton1Click:Connect(function() 
     espOn = not espOn
-    ESPBtn.Text = "ESP: "..(espOn and "ON" or "OFF")
+    ESPBtn.Text = "ESP Item: "..(espOn and "ON" or "OFF")
     if not espOn then
         for _, obj in pairs(Workspace:GetDescendants()) do
             if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight.Enabled = false end
             if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui.Enabled = false end
+        end
+    end
+end)
+
+ESPNpcBtn.MouseButton1Click:Connect(function()
+    espNpcOn = not espNpcOn
+    ESPNpcBtn.Text = "ESP NPC (Đỏ): "..(espNpcOn and "ON" or "OFF")
+    if not espNpcOn then
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:FindFirstChild("NPCHighlight") then obj.NPCHighlight.Enabled = false end
+            if obj:FindFirstChild("NPCTextGui") then obj.NPCTextGui.Enabled = false end
         end
     end
 end)
@@ -437,7 +481,7 @@ BrightBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- ESP + AUTO LỤM
+-- ESP ITEM + AUTO LỤM
 task.spawn(function()
     while scriptRunning do
         if espOn or collectOn then
@@ -452,26 +496,20 @@ task.spawn(function()
                         local isTarget = LootNames[obj.Name] ~= nil
                         local dist = (rootPos - obj.Position).Magnitude
                         
-                        -- ESP
                         if isTarget and espOn then
-                            local hl = obj:FindFirstChild("ESPHighlight")
-                            if not hl then
-                                hl = Instance.new("Highlight")
-                                hl.Name = "ESPHighlight"
-                                hl.FillColor = Color3.fromRGB(255, 0, 0)
-                                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-                                hl.Parent = obj
-                            end
+                            local hl = obj:FindFirstChild("ESPHighlight") or Instance.new("Highlight", obj)
+                            hl.Name = "ESPHighlight"
+                            hl.FillColor = Color3.fromRGB(255, 255, 0)
+                            hl.OutlineColor = Color3.fromRGB(255, 255, 255)
                             hl.Enabled = true
                             
                             local bgui = obj:FindFirstChild("ESPTextGui")
                             if not bgui then
-                                bgui = Instance.new("BillboardGui")
+                                bgui = Instance.new("BillboardGui", obj)
                                 bgui.Name = "ESPTextGui"
                                 bgui.Size = UDim2.new(0, 150, 0, 30)
                                 bgui.AlwaysOnTop = true
                                 bgui.ExtentsOffset = Vector3.new(0, 2, 0)
-                                bgui.Parent = obj
                                 
                                 local textLabel = Instance.new("TextLabel", bgui)
                                 textLabel.Name = "ESPLabel"
@@ -486,7 +524,6 @@ task.spawn(function()
                             bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
                         end
                         
-                        -- Auto Lụm
                         if collectOn and isTarget and dist <= 15 then
                             local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
                             if prompt then
@@ -501,6 +538,59 @@ task.spawn(function()
             end)
         end
         task.wait(0.3)
+    end
+end)
+
+-- ESP NPC MÀU ĐỎ
+task.spawn(function()
+    while scriptRunning do
+        if espNpcOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPos = char.HumanoidRootPart.Position
+
+                for _, model in pairs(Workspace:GetDescendants()) do
+                    if not scriptRunning then break end
+                    if model:IsA("Model") and model ~= char and model:FindFirstChildOfClass("Humanoid") then
+                        if not Players:GetPlayerFromCharacter(model) then
+                            local npcRoot = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head") or model.PrimaryPart
+                            if npcRoot then
+                                local dist = (rootPos - npcRoot.Position).Magnitude
+                                
+                                local hl = model:FindFirstChild("NPCHighlight") or Instance.new("Highlight", model)
+                                hl.Name = "NPCHighlight"
+                                hl.FillColor = Color3.fromRGB(255, 0, 0)
+                                hl.OutlineColor = Color3.fromRGB(150, 0, 0)
+                                hl.FillTransparency = 0.4
+                                hl.Enabled = true
+
+                                local bgui = npcRoot:FindFirstChild("NPCTextGui")
+                                if not bgui then
+                                    bgui = Instance.new("BillboardGui", npcRoot)
+                                    bgui.Name = "NPCTextGui"
+                                    bgui.Size = UDim2.new(0, 150, 0, 30)
+                                    bgui.AlwaysOnTop = true
+                                    bgui.ExtentsOffset = Vector3.new(0, 2.5, 0)
+
+                                    local textLabel = Instance.new("TextLabel", bgui)
+                                    textLabel.Name = "NPCLabel"
+                                    textLabel.Size = UDim2.new(1, 0, 1, 0)
+                                    textLabel.BackgroundTransparency = 1
+                                    textLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+                                    textLabel.TextStrokeTransparency = 0
+                                    textLabel.TextSize = 12
+                                    textLabel.Font = Enum.Font.GothamBold
+                                end
+                                bgui.Enabled = true
+                                bgui.NPCLabel.Text = string.format("[NPC] %s [%dm]", model.Name, math.floor(dist))
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.4)
     end
 end)
 
