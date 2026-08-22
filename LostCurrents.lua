@@ -1,5 +1,5 @@
 -- [[ Strawberry Hub - LostCurrents ]]
--- Phiên bản: 2.0 (Cleaned & Fixed)
+-- Phiên bản: 1.0 (Cleaned & Fixed)
 -- Tác giả: nguyen
 
 -- ===== DỊCH VỤ =====
@@ -377,15 +377,59 @@ Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
 
 local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.42, TPContainer, 1, 0)
 
--- PROFILE FRAME
-ProfileFrame = Instance.new("Frame", ScreenGui)
-ProfileFrame.Name = "ProfileFrame"
-ProfileFrame.Size = UDim2.new(0, 240, 0, 75)
-ProfileFrame.Position = UDim2.new(0.5, -120, 0.5, 150)
-ProfileFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-ProfileFrame.BackgroundTransparency = 0.3
-Instance.new("UICorner", ProfileFrame).CornerRadius = UDim.new(0, 8)
-MakeDraggable(ProfileFrame)
+-- ================= BẢNG THÔNG BÁO TỰ XÓA SAU 3S =================
+local NotificationFrame = Instance.new("Frame", ScreenGui)
+NotificationFrame.Name = "AutoDeleteNotice"
+NotificationFrame.Size = UDim2.new(0, 280, 0, 65)
+
+-- Căn chính giữa màn hình
+NotificationFrame.Position = UDim2.new(0.5, -140, 0.5, -32.5) 
+NotificationFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+NotificationFrame.BackgroundTransparency = 0.2
+NotificationFrame.Visible = true
+Instance.new("UICorner", NotificationFrame).CornerRadius = UDim.new(0, 8)
+
+-- Viền RGB Đổi Màu
+local NoticeStroke = Instance.new("UIStroke", NotificationFrame)
+NoticeStroke.Thickness = 1.5
+task.spawn(function()
+    while ScriptRunning and NotificationFrame and NotificationFrame.Parent do
+        for i = 0, 1, 0.05 do
+            if not ScriptRunning or not NotificationFrame or not NotificationFrame.Parent then break end
+            NoticeStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- BÊN TRÁI: Hình Roblox ID 88285387138547
+local NoticeImg = Instance.new("ImageLabel", NotificationFrame)
+NoticeImg.Size = UDim2.new(0, 48, 0, 48)
+NoticeImg.Position = UDim2.new(0, 8, 0.5, -24)
+NoticeImg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+NoticeImg.BackgroundTransparency = 0.5
+NoticeImg.Image = "rbxassetid://88285387138547"
+Instance.new("UICorner", NoticeImg).CornerRadius = UDim.new(0, 6)
+
+-- BÊN PHẢI: Chữ "owr : Nguyen / build : Nam"
+local NoticeText = Instance.new("TextLabel", NotificationFrame)
+NoticeText.Size = UDim2.new(1, -70, 1, 0)
+NoticeText.Position = UDim2.new(0, 62, 0, 0)
+NoticeText.BackgroundTransparency = 1
+NoticeText.Text = "owr : Nguyen / build : Nam"
+NoticeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoticeText.TextSize = 12
+NoticeText.Font = Enum.Font.GothamBold
+NoticeText.TextXAlignment = Enum.TextXAlignment.Left
+NoticeText.TextYAlignment = Enum.TextYAlignment.Center
+NoticeText.TextWrapped = true
+
+-- HÀM TỰ XÓA HẲN SAU ĐÚNG 3 GIÂY
+task.delay(3, function()
+    if NotificationFrame then
+        NotificationFrame:Destroy()
+    end
+end)
 
 local ProfileStroke = Instance.new("UIStroke", ProfileFrame)
 ProfileStroke.Thickness = 1.5
