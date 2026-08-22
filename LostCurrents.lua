@@ -51,12 +51,12 @@ local function MakeDraggable(gui)
     end)
 end
 
--- UI Setup
+-- UI Setup (Hình chữ nhật nằm ngang)
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Name = "StrawberryHub"
-MainFrame.Size = UDim2.new(0, 220, 0, 330)
-MainFrame.Position = UDim2.new(0.5, -110, 0.5, -165)
+MainFrame.Size = UDim2.new(0, 450, 0, 260) -- Chuyển sang kích thước chữ nhật ngang
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -130)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BackgroundTransparency = 0.3
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
@@ -76,18 +76,18 @@ end)
 
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "Strawberry / LostCurrents - by nguyen"
-Title.Size = UDim2.new(0, 140, 0, 25)
-Title.Position = UDim2.new(0.03, 0, 0.02, 0)
+Title.Size = UDim2.new(0, 300, 0, 25)
+Title.Position = UDim2.new(0.02, 0, 0.02, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.new(1, 1, 1)
-Title.TextSize = 9
+Title.TextSize = 12
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
 local HideBtn = Instance.new("TextButton", MainFrame)
 HideBtn.Text = "-"
 HideBtn.Size = UDim2.new(0, 22, 0, 22)
-HideBtn.Position = UDim2.new(0.72, 0, 0.02, 0)
+HideBtn.Position = UDim2.new(1, -52, 0.02, 0)
 HideBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 HideBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", HideBtn).CornerRadius = UDim.new(0, 4)
@@ -95,7 +95,7 @@ Instance.new("UICorner", HideBtn).CornerRadius = UDim.new(0, 4)
 local CloseBtn = Instance.new("TextButton", MainFrame)
 CloseBtn.Text = "X"
 CloseBtn.Size = UDim2.new(0, 22, 0, 22)
-CloseBtn.Position = UDim2.new(0.86, 0, 0.02, 0)
+CloseBtn.Position = UDim2.new(1, -26, 0.02, 0)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 CloseBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
@@ -126,46 +126,51 @@ end)
 HideBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; FloatBtn.Visible = true end)
 FloatBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatBtn.Visible = false end)
 
--- Nút Chuyển Tab (Main / Misc / TP)
-local TabMainBtn = Instance.new("TextButton", MainFrame)
+-- Thanh Sidebar bên trái chứa các nút chọn Tab
+local Sidebar = Instance.new("Frame", MainFrame)
+Sidebar.Size = UDim2.new(0, 100, 1, -35)
+Sidebar.Position = UDim2.new(0, 8, 0, 30)
+Sidebar.BackgroundTransparency = 1
+
+local TabMainBtn = Instance.new("TextButton", Sidebar)
 TabMainBtn.Text = "Main"
-TabMainBtn.Size = UDim2.new(0.28, 0, 0, 22)
-TabMainBtn.Position = UDim2.new(0.04, 0, 0.1, 0)
+TabMainBtn.Size = UDim2.new(1, 0, 0, 28)
+TabMainBtn.Position = UDim2.new(0, 0, 0, 0)
 TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", TabMainBtn).CornerRadius = UDim.new(0, 4)
 
-local TabMiscBtn = Instance.new("TextButton", MainFrame)
+local TabMiscBtn = Instance.new("TextButton", Sidebar)
 TabMiscBtn.Text = "Misc"
-TabMiscBtn.Size = UDim2.new(0.28, 0, 0, 22)
-TabMiscBtn.Position = UDim2.new(0.36, 0, 0.1, 0)
+TabMiscBtn.Size = UDim2.new(1, 0, 0, 28)
+TabMiscBtn.Position = UDim2.new(0, 0, 0, 34)
 TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 Instance.new("UICorner", TabMiscBtn).CornerRadius = UDim.new(0, 4)
 
-local TabTPBtn = Instance.new("TextButton", MainFrame)
+local TabTPBtn = Instance.new("TextButton", Sidebar)
 TabTPBtn.Text = "TP"
-TabTPBtn.Size = UDim2.new(0.28, 0, 0, 22)
-TabTPBtn.Position = UDim2.new(0.68, 0, 0.1, 0)
+TabTPBtn.Size = UDim2.new(1, 0, 0, 28)
+TabTPBtn.Position = UDim2.new(0, 0, 0, 68)
 TabTPBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TabTPBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 Instance.new("UICorner", TabTPBtn).CornerRadius = UDim.new(0, 4)
 
--- Container Các Tab
+-- Container Các Tab nằm bên phải
 local MainContainer = Instance.new("Frame", MainFrame)
-MainContainer.Size = UDim2.new(0.92, 0, 0.82, 0)
-MainContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
+MainContainer.Size = UDim2.new(1, -124, 1, -38)
+MainContainer.Position = UDim2.new(0, 116, 0, 30)
 MainContainer.BackgroundTransparency = 1
 
 local MiscContainer = Instance.new("Frame", MainFrame)
-MiscContainer.Size = UDim2.new(0.92, 0, 0.82, 0)
-MiscContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
+MiscContainer.Size = UDim2.new(1, -124, 1, -38)
+MiscContainer.Position = UDim2.new(0, 116, 0, 30)
 MiscContainer.BackgroundTransparency = 1
 MiscContainer.Visible = false
 
 local TPContainer = Instance.new("Frame", MainFrame)
-TPContainer.Size = UDim2.new(0.92, 0, 0.82, 0)
-TPContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
+TPContainer.Size = UDim2.new(1, -124, 1, -38)
+TPContainer.Position = UDim2.new(0, 116, 0, 30)
 TPContainer.BackgroundTransparency = 1
 TPContainer.Visible = false
 
@@ -184,11 +189,11 @@ TabMainBtn.MouseButton1Click:Connect(function() SetTab(TabMainBtn, MainContainer
 TabMiscBtn.MouseButton1Click:Connect(function() SetTab(TabMiscBtn, MiscContainer) end)
 TabTPBtn.MouseButton1Click:Connect(function() SetTab(TabTPBtn, TPContainer) end)
 
-local function CreateButton(text, y, parent)
+local function CreateButton(text, y, parent, widthScale, xPos)
     local b = Instance.new("TextButton", parent)
     b.Text = text
-    b.Size = UDim2.new(1, 0, 0, 25)
-    b.Position = UDim2.new(0, 0, y, 0)
+    b.Size = UDim2.new(widthScale or 1, 0, 0, 25)
+    b.Position = UDim2.new(xPos or 0, 0, y, 0)
     b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     b.TextColor3 = Color3.new(1, 1, 1)
     Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
@@ -199,46 +204,46 @@ end
 local FlySpeedInput = Instance.new("TextBox", MainContainer)
 FlySpeedInput.PlaceholderText = "Vận tốc Fly (VD: 50)"
 FlySpeedInput.Text = "50"
-FlySpeedInput.Size = UDim2.new(1, 0, 0, 25)
+FlySpeedInput.Size = UDim2.new(0.48, 0, 0, 25)
 FlySpeedInput.Position = UDim2.new(0, 0, 0, 0)
 FlySpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 FlySpeedInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", FlySpeedInput).CornerRadius = UDim.new(0, 4)
 
-local FlyBtn = CreateButton("Fly: OFF", 0.12, MainContainer)
+local FlyBtn = CreateButton("Fly: OFF", 0, MainContainer, 0.48, 0.52)
 
 local KillDistInput = Instance.new("TextBox", MainContainer)
 KillDistInput.PlaceholderText = "Tầm Kill Aura (VD: 25)"
 KillDistInput.Text = "25"
-KillDistInput.Size = UDim2.new(1, 0, 0, 25)
-KillDistInput.Position = UDim2.new(0, 0, 0.24, 0)
+KillDistInput.Size = UDim2.new(0.48, 0, 0, 25)
+KillDistInput.Position = UDim2.new(0, 0, 0.16, 0)
 KillDistInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 KillDistInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", KillDistInput).CornerRadius = UDim.new(0, 4)
 
-local KillAuraBtn = CreateButton("Kill Aura: OFF", 0.36, MainContainer)
-local CollectBtn = CreateButton("Auto Lụm: OFF", 0.48, MainContainer)
-local ESPBtn = CreateButton("ESP Item: OFF", 0.60, MainContainer)
-local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.72, MainContainer)
+local KillAuraBtn = CreateButton("Kill Aura: OFF", 0.16, MainContainer, 0.48, 0.52)
+local CollectBtn = CreateButton("Auto Lụm: OFF", 0.32, MainContainer, 0.48, 0)
+local ESPBtn = CreateButton("ESP Item: OFF", 0.32, MainContainer, 0.48, 0.52)
+local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.48, MainContainer, 1, 0)
 
 -- TAB MISC
-local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer)
-local NoclipBtn = CreateButton("Noclip: OFF", 0.12, MiscContainer)
-local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.24, MiscContainer)
+local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer, 1, 0)
+local NoclipBtn = CreateButton("Noclip: OFF", 0.16, MiscContainer, 1, 0)
+local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.32, MiscContainer, 1, 0)
 
 -- TAB TELEPORT (TP)
-local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer)
-local PirateBaseBtn = CreateButton("Base hải tặc", 0.12, TPContainer)
+local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer, 1, 0)
+local PirateBaseBtn = CreateButton("Base hải tặc", 0.16, TPContainer, 1, 0)
 
 local CustomTPInput = Instance.new("TextBox", TPContainer)
 CustomTPInput.PlaceholderText = "X, Y, Z (VD: 100, 50, -200)"
 CustomTPInput.Size = UDim2.new(1, 0, 0, 25)
-CustomTPInput.Position = UDim2.new(0, 0, 0.24, 0)
+CustomTPInput.Position = UDim2.new(0, 0, 0.32, 0)
 CustomTPInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 CustomTPInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
 
-local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.36, TPContainer)
+local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.48, TPContainer, 1, 0)
 
 -- Logic TP
 local function TeleportTo(x, y, z)
@@ -360,7 +365,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- LOGIC KILL AURA (TUỲ CHỈNH KHOẢNG CÁCH)
+-- LOGIC KILL AURA
 KillAuraBtn.MouseButton1Click:Connect(function()
     killAuraOn = not killAuraOn
     KillAuraBtn.Text = "Kill Aura: "..(killAuraOn and "ON" or "OFF")
@@ -373,11 +378,7 @@ task.spawn(function()
                 local char = LocalPlayer.Character
                 if not char or not char:FindFirstChild("HumanoidRootPart") then return end
                 local rootPos = char.HumanoidRootPart.Position
-
-                -- Lấy khoảng cách người dùng đã nhập
                 local maxDist = tonumber(KillDistInput.Text) or 25
-
-                -- Lấy vũ khí đang cầm trên tay
                 local equippedTool = char:FindFirstChildOfClass("Tool")
 
                 if equippedTool then
@@ -390,7 +391,6 @@ task.spawn(function()
                                     local dist = (rootPos - npcRoot.Position).Magnitude
                                     if dist <= maxDist then
                                         equippedTool:Activate()
-                                        
                                         local handle = equippedTool:FindFirstChild("Handle") or equippedTool:FindFirstChildWhichIsA("BasePart")
                                         if handle then
                                             firetouchinterest(handle, npcRoot, 0)
