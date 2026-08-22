@@ -948,4 +948,4 @@ end)
 
 -- Khởi động UI
 ShowUI()
-print("Strawberry Hub v1.0 - Đã tải thành công!")
+print("Strawberry Hub v2.0 - Đã tải thành công!")
