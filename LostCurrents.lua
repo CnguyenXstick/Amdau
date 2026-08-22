@@ -269,8 +269,27 @@ FixLagBtn.MouseButton1Click:Connect(function()
     FixLagBtn.Text = "Fix Lag (Boost FPS)"
 end)
 
--- LOGIC FLY CHUẨN (KHÔNG BỊ BAY NGƯỢC)
+-- LOGIC FLY BẰNG NÚT DI CHUYỂN
 local flyBV, flyBG = nil, nil
+local upPressed, downPressed = false, false
+
+-- Lắng nghe phím Bay Lên / Bay Xuống (Bàn phím PC)
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        upPressed = true
+    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then
+        downPressed = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.Space then
+        upPressed = false
+    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then
+        downPressed = false
+    end
+end)
 
 FlyBtn.MouseButton1Click:Connect(function()
     flyOn = not flyOn
@@ -303,7 +322,7 @@ FlyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Cập nhật hướng di chuyển theo Camera (Đã sửa lỗi bay ngược)
+-- RenderStepped: Đọc trực tiếp phím/joystick đang bấm
 RunService.RenderStepped:Connect(function()
     if flyOn and scriptRunning then
         local char = LocalPlayer.Character
@@ -314,14 +333,40 @@ RunService.RenderStepped:Connect(function()
             if flyBG and flyBV and hum then
                 flyBG.cframe = cam.CFrame
                 local speed = tonumber(FlySpeedInput.Text) or 50
-                local moveDir = hum.MoveDirection
+                local moveDir = hum.MoveDirection -- Lấy hướng từ phím WASD / Joystick Điện thoại
 
+                local targetVelocity = Vector3.new(0, 0, 0)
+
+                -- Tính toán hướng di chuyển ngang/dọc theo Camera
                 if moveDir.Magnitude > 0 then
-                    -- Nhân vector chuẩn để bay đúng hướng mặt nhìn
-                    local flyDir = (cam.CFrame.RightVector * moveDir.X) + (cam.CFrame.LookVector * moveDir.Z)
-                    flyBV.velocity = flyDir.Unit * speed
+                    targetVelocity = cam.CFrame:VectorToWorldSpace(CFrame.new(rootPosition or Vector3.new(), rootPosition or Vector3.new()):VectorToObjectSpace(moveDir)) * speed
+                    targetVelocity = (cam.CFrame.RightVector * (cam.CFrame.RightVector:Dot(moveDir * speed))) + (cam.CFrame.LookVector * (cam.CFrame.LookVector:Dot(moveDir * speed)))
+                end
+
+                -- Xử lý bay lên / hạ xuống
+                local verticalVelocity = 0
+                if upPressed then
+                    verticalVelocity = speed
+                elseif downPressed then
+                    verticalVelocity = -speed
+                end
+
+                -- Tạo độ nẩy/bay chuẩn theo hướng nhìn
+                if moveDir.Magnitude > 0 or upPressed or downPressed then
+                    local finalDir = Vector3.new(0, 0, 0)
+                    if moveDir.Magnitude > 0 then
+                        -- Lấy trực tiếp LookVector để hướng camera ngẩng lên/cúi xuống sẽ bay theo chiều đó
+                        local forwardVector = cam.CFrame.LookVector
+                        local rightVector = cam.CFrame.RightVector
+                        
+                        -- Chuyển MoveDirection sang hệ tọa độ Camera
+                        local relativeMove = cam.CFrame:VectorToObjectSpace(moveDir)
+                        finalDir = (forwardVector * -relativeMove.Z) + (rightVector * relativeMove.X)
+                    end
+                    
+                    flyBV.velocity = (finalDir * speed) + Vector3.new(0, verticalVelocity, 0)
                 else
-                    flyBV.velocity = Vector3.new(0, 0, 0)
+                    flyBV.velocity = Vector3.new(0, 0, 0) -- Đứng yên lơ lửng khi không bấm nút
                 end
             end
         end
