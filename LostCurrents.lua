@@ -1,1 +1,820 @@
-local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v171,v172) local v173={};for v243=1, #v171 do v6(v173,v0(v4(v1(v2(v171,v243,v243 + 1 )),v1(v2(v172,1 + (v243% #v172) ,1 + (v243% #v172) + 1 )))%256 ));end return v5(v173);end local v8=game:GetService(v7("\225\207\218\60\227\169\212","\126\177\163\187\69\134\219\167"));local v9=game:GetService(v7("\20\194\56\206\239\51\204\41\192","\156\67\173\74\165"));local v10=game:GetService(v7("\6\162\71\37\185\52\80\61\180\76","\38\84\215\41\118\220\70"));local v11=game:GetService(v7("\101\5\39\0\215\94\6\55\6\205\85\4\52\27\253\85","\158\48\118\66\114"));local v12=game:GetService(v7("\135\45\23\62\103\172\245\172","\155\203\68\112\86\19\197"));local v13=v8.LocalPlayer;local v14=true;local v15,v16,v17,v18,v19,v20,v21=false,false,false,false,false,false,false;local v22=false;local v23=22 + 10 ;local v24=false;local v25=100;local v26=false;local v27=84 + 66 ;local v28=false;local v29=v12.Ambient;local v30=v12.OutdoorAmbient;local v31={[v7("\117\222\36\253\80","\152\38\189\86\156\32\24\133")]=true,[v7("\219\88\171\66","\38\156\55\199")]=true,[v7("\139\117\121\59\7","\35\200\29\28\72\115\20\154")]=true,["La bàn"]=true,[v7("\58\176\220\207\140\63\39","\84\121\223\177\191\237\76")]=true,[v7("\152\89\192\174","\161\219\54\169\192\90\48\80")]=true,[v7("\101\77\15\49","\69\41\34\96")]=true,[v7("\149\215\210\7","\75\220\163\183\106\98")]=true,[v7("\54\168\142\54\202\23\168\142","\185\98\218\235\87")]=true,["Thùng"]=true,[v7("\255\52\50\232\217","\202\171\92\71\134\190")]=true,[v7("\11\192\62\154\44\205","\232\73\161\76")]=true,[v7("\152\203\67\73\27","\126\219\185\34\61")]=true,[v7("\46\193\70","\135\108\174\62\18\30\23\147")]=true,["Dây"]=true,[v7("\146\232\51","\167\214\137\74\171\120\206\83")]=true,[v7("\185\255\34\88","\199\235\144\82\61\152")]=true,[v7("\52\2\171\34\9\17","\75\103\118\217")]=true,[v7("\228\85\114\24\188","\126\167\52\16\116\217")]=true};pcall(function() local v174=0 + 0 ;local v175;local v176;while true do if (v174==(1 + 0)) then setreadonly(v175,false);v175.__namecall=newcclosure(function(v298,...) local v299=0 + 0 ;local v300;while true do local v309=433 -(153 + 280) ;while true do if (v309==(0 -0)) then if (v299==(0 + 0)) then local v396=0;while true do if (v396==(0 + 0)) then v300=getnamecallmethod();if ((v300==v7("\238\39\50\133\135\28\238\222\43\50","\156\168\78\64\224\212\121")) and v298) then local v450=0 + 0 ;local v451;while true do if (0==v450) then v451=string.lower(v298.Name);if (v451:find(v7("\1\251\160\194","\174\103\142\197")) or v451:find(v7("\81\41\76","\152\54\72\63\88\69\62")) or v451:find(v7("\215\203\224\79\193\201\235","\60\180\164\142")) or v451:find(v7("\64\95\11\46","\114\56\62\101\73\71\141")) or v451:find(v7("\188\251\218\205\182","\164\216\137\187")) or v451:find(v7("\199\245\52","\107\178\134\81\210\198\158"))) then return nil;end break;end end end v396=1 + 0 ;end if (v396==1) then v299=1;break;end end end if (v299==1) then return v176(v298,...);end break;end end end end);v174=2 + 0 ;end if (v174==(0 -0)) then v175=getrawmetatable(game);v176=v175.__namecall;v174=1;end if (v174==(2 + 0)) then setreadonly(v175,true);break;end end end);local function v32(v177) local v178=667 -(89 + 578) ;local v179;local v180;local v181;local v182;while true do if (v178==(1 + 0)) then v177.InputChanged:Connect(function(v301) if ((v301.UserInputType==Enum.UserInputType.MouseMovement) or (v301.UserInputType==Enum.UserInputType.Touch)) then v180=v301;end end);v11.InputChanged:Connect(function(v302) if ((v302==v180) and v179) then local v332=v302.Position-v181 ;v177.Position=UDim2.new(v182.X.Scale,v182.X.Offset + v332.X ,v182.Y.Scale,v182.Y.Offset + v332.Y );end end);break;end if (v178==0) then v179,v180,v181,v182=nil;v177.InputBegan:Connect(function(v303) if ((v303.UserInputType==Enum.UserInputType.MouseButton1) or (v303.UserInputType==Enum.UserInputType.Touch)) then local v334=0;while true do if (v334==(0 -0)) then v179=true;v181=v303.Position;v334=1;end if (v334==(1050 -(572 + 477))) then v182=v177.Position;v303.Changed:Connect(function() if (v303.UserInputState==Enum.UserInputState.End) then v179=false;end end);break;end end end end);v178=1 + 0 ;end end end local v33=Instance.new(v7("\11\13\144\195\175\54\41\151\207","\202\88\110\226\166"));v33.Name=v7("\240\27\144\246\221\193\10\144\229\211\235\26\128\208\223\202","\170\163\111\226\151");v33.ResetOnSpawn=false;v33.Parent=game:GetService(v7("\50\63\160\61\105\34\32","\73\113\80\210\88\46\87"));local v37=Instance.new(v7("\167\62\204\31\226","\135\225\76\173\114"),v33);v37.Name=v7("\55\236\177\190\138\175\166\23\232","\199\122\141\216\208\204\221");v37.Size=UDim2.new(0 + 0 ,54 + 396 ,0,270);v37.Position=UDim2.new(86.5 -(84 + 2) , -(370 -145),0.5, -(98 + 37));v37.BackgroundColor3=Color3.fromRGB(15,857 -(497 + 345) ,1 + 14 );v37.BackgroundTransparency=0.3;Instance.new(v7("\152\244\51\255\106\248\168\207","\150\205\189\112\144\24"),v37).CornerRadius=UDim.new(0,2 + 6 );v32(v37);local v44=Instance.new(v7("\16\173\140\88\22\135\26\21","\112\69\228\223\44\100\232\113"),v37);v44.Thickness=2;task.spawn(function() while v14 do for v255=0,1,1333.05 -(605 + 728)  do if  not v14 then break;end v44.Color=Color3.fromHSV(v255,1 + 0 ,1);task.wait(0.1 -0 );end end end);local v46=Instance.new(v7("\224\26\31\199\154\125\132\209\19","\230\180\127\103\179\214\28"),v37);v46.Text=v7("\191\17\77\71\243\67\229\158\23\70\6\171\1\204\131\22\75\101\241\83\242\137\11\75\85\164\12\160\142\28\31\72\227\84\249\137\11","\128\236\101\63\38\132\33");v46.Size=UDim2.new(0,300,0 + 0 ,25);v46.Position=UDim2.new(0.02,0,0.02,0);v46.BackgroundTransparency=3 -2 ;v46.TextColor3=Color3.new(1 + 0 ,1,2 -1 );v46.TextSize=10 + 2 ;v46.Font=Enum.Font.GothamBold;v46.TextXAlignment=Enum.TextXAlignment.Left;local v57=Instance.new(v7("\152\172\9\80\148\254\219\184\166\31","\175\204\201\113\36\214\139"),v37);v57.Text="-";v57.Size=UDim2.new(0,511 -(457 + 32) ,0 + 0 ,1424 -(832 + 570) );v57.Position=UDim2.new(1 + 0 , -(14 + 38),0.02 -0 ,0 + 0 );v57.BackgroundColor3=Color3.fromRGB(846 -(588 + 208) ,134 -84 ,1850 -(884 + 916) );v57.TextColor3=Color3.new(1,1 -0 ,1);Instance.new(v7("\114\229\22\211\22\73\201\39","\100\39\172\85\188"),v57).CornerRadius=UDim.new(0,3 + 1 );local v64=Instance.new(v7("\153\125\161\148\17\184\108\173\143\61","\83\205\24\217\224"),v37);v64.Text="X";v64.Size=UDim2.new(653 -(232 + 421) ,1911 -(1569 + 320) ,0 + 0 ,5 + 17 );v64.Position=UDim2.new(3 -2 , -26,605.02 -(316 + 289) ,0 -0 );v64.BackgroundColor3=Color3.fromRGB(7 + 143 ,0,1453 -(666 + 787) );v64.TextColor3=Color3.new(1,426 -(360 + 65) ,1 + 0 );Instance.new(v7("\211\236\238\50\244\203\200\47","\93\134\165\173"),v64).CornerRadius=UDim.new(254 -(79 + 175) ,5 -1 );local v71=Instance.new(v7("\151\255\192\197\63\236\167\106\170\253\207","\30\222\146\161\162\90\174\210"),v33);v71.Name=v7("\202\94\117\4\199\91\100\30\234\64","\106\133\46\16");v71.Size=UDim2.new(0 + 0 ,137 -92 ,0 -0 ,944 -(503 + 396) );v71.Position=UDim2.new(181.1 -(92 + 89) ,0,0.1,0);v71.BackgroundColor3=Color3.fromRGB(28 -13 ,8 + 7 ,9 + 6 );v71.BackgroundTransparency=0.3;v71.Image=v7("\74\34\107\253\73\83\93\52\122\248\0\15\23\120\43\174\2\21\11\120\36\173\9\24\13\116\36","\32\56\64\19\156\58");v71.Visible=false;Instance.new(v7("\111\225\198\89\72\252\133\72","\224\58\168\133\54\58\146"),v71).CornerRadius=UDim.new(1,0 -0 );v32(v71);local v80=Instance.new(v7("\108\127\120\233\103\137\140\14","\107\57\54\43\157\21\230\231"),v71);v80.Thickness=1 + 1 ;task.spawn(function() while v14 do for v257=0 -0 ,1,0.05 do if  not v14 then break;end v80.Color=Color3.fromHSV(v257,1 + 0 ,1);task.wait(0.1 + 0 );end end end);v57.MouseButton1Click:Connect(function() v37.Visible=false;v71.Visible=true;end);v71.MouseButton1Click:Connect(function() local v185=0;while true do if (v185==(0 -0)) then v37.Visible=true;v71.Visible=false;break;end end end);local v82=Instance.new(v7("\253\153\16\248\188","\175\187\235\113\149\217\188"),v37);v82.Size=UDim2.new(0 + 0 ,152 -52 ,1245 -(485 + 759) , -35);v82.Position=UDim2.new(0 -0 ,1197 -(442 + 747) ,1135 -(832 + 303) ,976 -(88 + 858) );v82.BackgroundTransparency=1;local function v86(v186,v187) local v188=0;local v189;while true do if (3==v188) then Instance.new(v7("\126\250\155\67\9\115\78\193","\29\43\179\216\44\123"),v189).CornerRadius=UDim.new(0 + 0 ,4 + 0 );return v189;end if (v188==(0 + 0)) then v189=Instance.new(v7("\8\170\153\88\193\108\108\40\160\143","\24\92\207\225\44\131\25"),v82);v189.Text=v186;v188=790 -(766 + 23) ;end if (v188==(4 -3)) then v189.Size=UDim2.new(1 -0 ,0 -0 ,0 -0 ,28);v189.Position=UDim2.new(1073 -(1036 + 37) ,0 + 0 ,0 -0 ,v187);v188=2 + 0 ;end if (v188==2) then v189.BackgroundColor3=Color3.fromRGB(1510 -(641 + 839) ,943 -(910 + 3) ,30);v189.TextColor3=Color3.new(0.7,0.7 -0 ,0.7);v188=1687 -(1466 + 218) ;end end end local v87=v86(v7("\144\216\41\66","\44\221\185\64"),0);local v88=v86(v7("\44\238\91\92","\19\97\135\40\63"),34);local v89=v86(v7("\154\108","\81\206\60\83\91\79"),32 + 36 );v87.BackgroundColor3=Color3.fromRGB(1208 -(556 + 592) ,22 + 38 ,60);v87.TextColor3=Color3.new(809 -(329 + 479) ,855 -(174 + 680) ,3 -2 );local function v92() local v190=0 -0 ;local v191;while true do local v244=0 + 0 ;while true do if (v244==1) then if (v190==0) then v191=Instance.new(v7("\104\185\209\127\42","\196\46\203\176\18\79\163\45"),v37);v191.Size=UDim2.new(740 -(396 + 343) , -124,1 + 0 , -(1515 -(29 + 1448)));v190=1390 -(135 + 1254) ;end break;end if (v244==(0 -0)) then if (v190==(9 -7)) then return v191;end if ((1 + 0)==v190) then v191.Position=UDim2.new(1527 -(389 + 1138) ,116,574 -(102 + 472) ,29 + 1 );v191.BackgroundTransparency=1 + 0 ;v190=2 + 0 ;end v244=1;end end end end local v93=v92();local v94=v92();v94.Visible=false;local v96=v92();v96.Visible=false;local function v98(v192,v193) local v194=0;while true do if ((1546 -(320 + 1225))==v194) then v87.TextColor3=Color3.new(0.7 -0 ,0.7,0.7 + 0 );v88.BackgroundColor3=Color3.fromRGB(1494 -(157 + 1307) ,30,1889 -(821 + 1038) );v88.TextColor3=Color3.new(0.7 -0 ,0.7,0.7 + 0 );v89.BackgroundColor3=Color3.fromRGB(53 -23 ,12 + 18 ,74 -44 );v194=2;end if ((1028 -(834 + 192))==v194) then v89.TextColor3=Color3.new(0.7 + 0 ,0.7,0.7);v193.Visible=true;v192.BackgroundColor3=Color3.fromRGB(16 + 44 ,60,2 + 58 );v192.TextColor3=Color3.new(1 -0 ,1,305 -(300 + 4) );break;end if (v194==(0 + 0)) then v93.Visible=false;v94.Visible=false;v96.Visible=false;v87.BackgroundColor3=Color3.fromRGB(78 -48 ,392 -(112 + 250) ,12 + 18 );v194=1;end end end v87.MouseButton1Click:Connect(function() v98(v87,v93);end);v88.MouseButton1Click:Connect(function() v98(v88,v94);end);v89.MouseButton1Click:Connect(function() v98(v89,v96);end);local function v99(v195,v196,v197,v198,v199) local v200=Instance.new(v7("\140\39\102\10\6\238\251\172\45\112","\143\216\66\30\126\68\155"),v197);v200.Text=v195;v200.Size=UDim2.new(v198 or (2 -1) ,0 + 0 ,0 + 0 ,24);v200.Position=UDim2.new(v199 or (0 + 0) ,0 + 0 ,v196,0);v200.BackgroundColor3=Color3.fromRGB(30 + 10 ,1454 -(1001 + 413) ,40);v200.TextColor3=Color3.new(2 -1 ,1,883 -(244 + 638) );Instance.new(v7("\159\225\46\196\215\173\210\243","\129\202\168\109\171\165\195\183"),v200).CornerRadius=UDim.new(693 -(627 + 66) ,4);return v200;end local v100=Instance.new(v7("\22\93\47\204\252\27\254","\134\66\56\87\184\190\116"),v93);v100.PlaceholderText="Vận tốc Fly (VD: 50)";v100.Text=v7("\105\97","\85\92\81\105\219\121\139\65");v100.Size=UDim2.new(0.48 -0 ,0,602 -(512 + 90) ,1930 -(1665 + 241) );v100.Position=UDim2.new(717 -(373 + 344) ,0,0 + 0 ,0 + 0 );v100.BackgroundColor3=Color3.fromRGB(105 -65 ,67 -27 ,1139 -(35 + 1064) );v100.TextColor3=Color3.new(1,1 + 0 ,2 -1 );Instance.new(v7("\200\154\115\74\110\209\248\161","\191\157\211\48\37\28"),v100).CornerRadius=UDim.new(0 + 0 ,1240 -(298 + 938) );local v108=v99(v7("\249\19\237\70\122\240\57\210","\90\191\127\148\124"),1259 -(233 + 1026) ,v93,1666.48 -(636 + 1030) ,0.52 + 0 );local v109=Instance.new(v7("\76\130\54\3\90\136\54","\119\24\231\78"),v93);v109.PlaceholderText="Tầm Kill Aura (VD: 25)";v109.Text=v7("\208\120","\113\226\77\197\42\188\32");v109.Size=UDim2.new(0.48 + 0 ,0 + 0 ,0,2 + 22 );v109.Position=UDim2.new(221 -(55 + 166) ,0 + 0 ,0.14 + 0 ,0);v109.BackgroundColor3=Color3.fromRGB(40,152 -112 ,337 -(36 + 261) );v109.TextColor3=Color3.new(1,1 -0 ,1369 -(34 + 1334) );Instance.new(v7("\15\63\215\186\40\24\241\167","\213\90\118\148"),v109).CornerRadius=UDim.new(0 + 0 ,4);local v117=v99(v7("\112\39\184\90\13\122\59\166\87\23\27\1\146\112","\45\59\78\212\54"),0.14 + 0 ,v93,0.48,1283.52 -(1035 + 248) );local v118=v99("Auto Lụm: OFF",0.28,v93,21.48 -(20 + 1) ,0 + 0 );local v119=v99(v7("\53\101\179\203\175\58\168\253\74\22\172\173\160","\144\112\54\227\235\230\78\205"),319.28 -(134 + 185) ,v93,0.48,1133.52 -(549 + 584) );local v120=v99("ESP NPC (Đỏ): OFF",685.42 -(314 + 371) ,v93,3 -2 ,968 -(478 + 490) );local v121=v99(v7("\149\61\3\240\144\121\161\33\8\244\196\1\243\7\41\218","\59\211\72\111\156\176"),0 + 0 ,v94,1173 -(786 + 386) ,0);local v122=v99(v7("\96\136\224\33\71\151\185\109\97\161\197","\77\46\231\131"),0.13 -0 ,v94,1380 -(1055 + 324) ,1340 -(1093 + 247) );local v123=v99(v7("\156\93\174\0\150\85\177\0\242\118\185\79\169\64\246\102\138\103\255","\32\218\52\214"),0.26,v94,1,0 + 0 );local v124=Instance.new(v7("\122\18\41\188\211\191\93","\58\46\119\81\200\145\208\37"),v94);v124.PlaceholderText="Tốc độ chạy";v124.Text=tostring(v23);v124.Size=UDim2.new(0.48 + 0 ,0 -0 ,0 -0 ,67 -43 );v124.Position=UDim2.new(0 -0 ,0 + 0 ,0.39 -0 ,0 -0 );v124.BackgroundColor3=Color3.fromRGB(31 + 9 ,102 -62 ,728 -(364 + 324) );v124.TextColor3=Color3.new(2 -1 ,2 -1 ,1 + 0 );Instance.new(v7("\30\165\19\163\187\179\51\57","\86\75\236\80\204\201\221"),v124).CornerRadius=UDim.new(0 -0 ,4);local v132=v99(v7("\69\64\123\142\205\155\119\68\115\223\190\164\84\103","\235\18\33\23\229\158"),0.39 -0 ,v94,0.48 -0 ,1268.52 -(1249 + 19) );local v133=Instance.new(v7("\100\191\217\175\114\181\217","\219\48\218\161"),v94);v133.PlaceholderText="Lực nhảy";v133.Text=tostring(v25);v133.Size=UDim2.new(0.48,0,0 + 0 ,24);v133.Position=UDim2.new(0,0,0.52 -0 ,1086 -(686 + 400) );v133.BackgroundColor3=Color3.fromRGB(32 + 8 ,40,269 -(73 + 156) );v133.TextColor3=Color3.new(1 + 0 ,812 -(721 + 90) ,1 + 0 );Instance.new(v7("\209\88\95\70\201\65\229\246","\128\132\17\28\41\187\47"),v133).CornerRadius=UDim.new(0 -0 ,474 -(224 + 246) );local v141=v99(v7("\43\39\11\42\109\14\37\3\40\7\65\29\32\28","\61\97\82\102\90"),0.52 -0 ,v94,0.48 -0 ,0.52 + 0 );local v142=Instance.new(v7("\152\43\179\95\229\88\6","\105\204\78\203\43\167\55\126"),v94);v142.PlaceholderText="Tốc độ thuyền";v142.Text=tostring(v27);v142.Size=UDim2.new(0.48 + 0 ,0,0 + 0 ,24);v142.Position=UDim2.new(0,0,0.65 -0 ,0);v142.BackgroundColor3=Color3.fromRGB(133 -93 ,553 -(203 + 310) ,2033 -(1238 + 755) );v142.TextColor3=Color3.new(1 + 0 ,1535 -(709 + 825) ,1);Instance.new(v7("\144\131\0\17\1\10\194\67","\49\197\202\67\126\115\100\167"),v142).CornerRadius=UDim.new(0 -0 ,5 -1 );local v150=v99(v7("\21\84\222\61\192\101\78\50\94\219\115\192\121\120\17","\62\87\59\191\73\224\54"),864.65 -(196 + 668) ,v94,0.48 -0 ,0.52 -0 );local v151=v99("Băng Nhiên Liệu (No-Fuel): OFF",0.78,v94,834 -(171 + 662) ,93 -(4 + 89) );v124.FocusLost:Connect(function() local v207=0 -0 ;local v208;while true do if (v207==0) then v208=tonumber(v124.Text);if v208 then v23=v208;else v124.Text=tostring(v23);end break;end end end);v133.FocusLost:Connect(function() local v209=0 + 0 ;local v210;while true do if (v209==(0 -0)) then v210=tonumber(v133.Text);if v210 then v25=v210;else v133.Text=tostring(v25);end break;end end end);v142.FocusLost:Connect(function() local v211=0 + 0 ;local v212;while true do if (v211==(1486 -(35 + 1451))) then v212=tonumber(v142.Text);if v212 then v27=v212;else v142.Text=tostring(v27);end break;end end end);v132.MouseButton1Click:Connect(function() v22= not v22;v132.Text=v7("\208\3\246\194\212\18\255\204\227\88\186","\169\135\98\154")   .. ((v22 and v7("\228\89","\168\171\23\68\52\157\83")) or v7("\219\87\211","\231\148\17\149\205\69\77")) ;if ( not v22 and v13.Character and v13.Character:FindFirstChild(v7("\168\178\202\250\89\240\137\163","\159\224\199\167\155\55"))) then v13.Character.Humanoid.WalkSpeed=1469 -(28 + 1425) ;end end);v141.MouseButton1Click:Connect(function() v24= not v24;v141.Text=v7("\221\230\49\194\199\252\43\215\229\169\124","\178\151\147\92")   .. ((v24 and v7("\163\211","\26\236\157\44\82\114\44")) or v7("\5\8\243","\59\74\78\181")) ;if ( not v24 and v13.Character and v13.Character:FindFirstChild(v7("\13\196\87\91\189\42\216\94","\211\69\177\58\58"))) then local v260=1993 -(941 + 1052) ;while true do if (v260==0) then v13.Character.Humanoid.UseJumpPower=true;v13.Character.Humanoid.JumpPower=48 + 2 ;break;end end end end);v150.MouseButton1Click:Connect(function() local v215=1514 -(822 + 692) ;while true do if ((0 -0)==v215) then v26= not v26;v150.Text=v7("\149\234\120\225\169\248\167\224\124\241\179\139","\171\215\133\25\149\137")   .. ((v26 and v7("\206\230","\34\129\168\82\154\143\80\156")) or v7("\170\148\21","\233\229\210\83\107\40\46")) ;break;end end end);v151.MouseButton1Click:Connect(function() local v216=0 + 0 ;while true do if (v216==(297 -(45 + 252))) then v28= not v28;v151.Text="Băng Nhiên Liệu (No-Fuel): "   .. ((v28 and v7("\238\108","\101\161\34\82\182")) or v7("\199\43\127","\78\136\109\57\158\187\130\226")) ;break;end end end);local v152=v99("TP Cố Định (1230, 220, 60)",0 + 0 ,v96,1 + 0 ,0);local v153=v99("Base hải tặc",0.14 -0 ,v96,434 -(114 + 319) ,0 -0 );local v154=Instance.new(v7("\10\58\225\229\28\48\225","\145\94\95\153"),v96);v154.PlaceholderText=v7("\197\129\84\236\2\247\199\141\92\227\106\237\189\156\68\133\2\247\168\157\88\149\3\229\173\157\93","\215\157\173\116\181\46");v154.Size=UDim2.new(1,0 -0 ,0,16 + 8 );v154.Position=UDim2.new(0 -0 ,0 -0 ,1963.28 -(556 + 1407) ,1206 -(741 + 465) );v154.BackgroundColor3=Color3.fromRGB(505 -(170 + 295) ,22 + 18 ,37 + 3 );v154.TextColor3=Color3.new(2 -1 ,1 + 0 ,1);Instance.new(v7("\0\157\168\253\200\59\177\153","\186\85\212\235\146"),v154).CornerRadius=UDim.new(0,4);local v161=v99("TP Tọa Độ Đã Nhập",0.42 + 0 ,v96,1 + 0 ,1230 -(957 + 273) );local function v162(v217,v218,v219) local v220=v13.Character;if (v220 and v220:FindFirstChild(v7("\234\148\27\255\55\225\81\198\179\25\241\45\222\89\208\149","\56\162\225\118\158\89\142"))) then v220.HumanoidRootPart.CFrame=CFrame.new(v217,v218,v219);end end v152.MouseButton1Click:Connect(function() v162(1230,59 + 161 ,25 + 35 );end);v153.MouseButton1Click:Connect(function() v162( -(9526 -7026),658 -408 , -(4581 -3081));end);v161.MouseButton1Click:Connect(function() local v221=v154.Text;local v222={};for v245 in string.gmatch(v221,v7("\103\72\159\234\38\157\18\56\139","\184\60\101\160\207\66")) do table.insert(v222,tonumber(v245));end if ( #v222>=(14 -11)) then v162(v222[1781 -(389 + 1391) ],v222[2 + 0 ],v222[1 + 2 ]);end end);v123.MouseButton1Click:Connect(function() local v223=0;while true do if (v223==(2 -1)) then task.wait(1.5);v123.Text=v7("\226\194\11\132\113\247\175\132\131\49\203\82\229\188\132\237\35\247\20","\200\164\171\115\164\61\150");break;end if (v223==0) then pcall(function() local v304=951 -(783 + 168) ;while true do if (v304==(3 -2)) then v12.Brightness=0;for v382,v383 in pairs(v12:GetChildren()) do if (v383:IsA(v7("\1\141\111\168\20\132\122\185\50\150","\220\81\226\28")) or v383:IsA(v7("\49\217\151\233\207\193\21\208\129\239","\167\115\181\226\155\138")) or v383:IsA(v7("\209\55\233\110\122\104\213\199\36\225\89\120\101","\166\130\66\135\60\27\17")) or v383:IsA(v7("\102\70\193\122\61\97\76\200\112\51\80","\80\36\42\174\21"))) then v383.Enabled=false;end end v304=2;end if (v304==(0 + 0)) then v12.GlobalShadows=false;v12.FogEnd=8999999799 -(309 + 2) ;v304=1;end if ((5 -3)==v304) then for v384,v385 in pairs(v9:GetDescendants()) do if (v385:IsA(v7("\108\17\36\127\126\17\37\110","\26\46\112\87")) and  not v385:IsA(v7("\148\38\184\124\143\190\87\160","\212\217\67\203\20\223\223\37"))) then local v398=0;while true do if (v398==(1212 -(1090 + 122))) then v385.Material=Enum.Material.SmoothPlastic;v385.Reflectance=0 + 0 ;break;end end elseif (v385:IsA(v7("\158\136\171\211\182","\178\218\237\200")) or v385:IsA(v7("\130\176\254\196\163\167\227","\176\214\213\134"))) then v385:Destroy();elseif (v385:IsA(v7("\196\172\164\192\161\85\85\241\136\187\221\188\66\92\230","\57\148\205\214\180\200\54")) or v385:IsA(v7("\38\239\52\61\122","\22\114\157\85\84"))) then v385.Enabled=false;end end break;end end end);v123.Text="Đã Fix Lag!";v223=3 -2 ;end end end);local v163,v164=nil,nil;local v165,v166=false,false;v11.InputBegan:Connect(function(v224,v225) local v226=0 + 0 ;while true do if ((1118 -(628 + 490))==v226) then if v225 then return;end if (v224.KeyCode==Enum.KeyCode.Space) then v165=true;elseif ((v224.KeyCode==Enum.KeyCode.LeftShift) or (v224.KeyCode==Enum.KeyCode.LeftControl)) then v166=true;end break;end end end);v11.InputEnded:Connect(function(v227) if (v227.KeyCode==Enum.KeyCode.Space) then v165=false;elseif ((v227.KeyCode==Enum.KeyCode.LeftShift) or (v227.KeyCode==Enum.KeyCode.LeftControl)) then v166=false;end end);local function v167() local v228=0;local v229;while true do if (v228==(1 + 0)) then v229=v13.Character;if v229 then local v315=0 -0 ;local v316;while true do if (v315==0) then v316=v229:FindFirstChildOfClass(v7("\150\225\14\68\141\177\253\7","\227\222\148\99\37"));if v316 then v316.PlatformStand=false;end break;end end end break;end if (v228==(0 -0)) then if v164 then local v317=0;while true do if (v317==0) then v164:Destroy();v164=nil;break;end end end if v163 then local v318=774 -(431 + 343) ;local v319;while true do if (v318==(0 -0)) then v319=0 -0 ;while true do if ((0 + 0)==v319) then v163:Destroy();v163=nil;break;end end break;end end end v228=1;end end end v108.MouseButton1Click:Connect(function() v15= not v15;v108.Text=v7("\21\94\75\172\185","\153\83\50\50\150")   .. ((v15 and v7("\114\88","\45\61\22\19\124\19\203")) or v7("\238\52\43","\217\161\114\109\149\98\16")) ;local v231=v13.Character;if  not v231 then return;end local v232=v231:FindFirstChild(v7("\58\53\53\125\178\123\27\36\10\115\179\96\34\33\42\104","\20\114\64\88\28\220"));local v233=v231:FindFirstChildOfClass(v7("\25\20\223\181\246\223\180\53","\221\81\97\178\212\152\176"));if v15 then if (v232 and v233) then local v305=0 + 0 ;while true do if (v305==(1695 -(556 + 1139))) then v164=Instance.new(v7("\239\232\25\226\61\212\245\18","\122\173\135\125\155"),v232);v164.P=90015 -(6 + 9) ;v305=1 + 0 ;end if (v305==2) then v163=Instance.new(v7("\166\206\4\160\9\52\196\139\194\9\173\38","\168\228\161\96\217\95\81"),v232);v163.velocity=Vector3.new(0 + 0 ,0,169 -(28 + 141) );v305=2 + 1 ;end if (v305==1) then v164.maxTorque=Vector3.new(8999999488,9026349817 -26350329 ,8999999488);v164.cframe=v232.CFrame;v305=2 + 0 ;end if (v305==3) then v163.maxForce=Vector3.new(8999999488,9000000805 -(486 + 831) ,8949752754 -  -50246734 );v233.PlatformStand=true;break;end end end else v167();end end);v10.RenderStepped:Connect(function() if (v15 and v14) then local v262=0;local v263;while true do if (v262==(0 -0)) then v263=v13.Character;if (v263 and v263:FindFirstChild(v7("\243\196\35\93\33\88\210\213\28\83\32\67\235\208\60\72","\55\187\177\78\60\79"))) then local v355=0 + 0 ;local v356;local v357;local v358;while true do if (v355==0) then v356=0;v357=nil;v355=3 -2 ;end if (v355==(1264 -(668 + 595))) then v358=nil;while true do if ((0 + 0)==v356) then v357=v263:FindFirstChildOfClass(v7("\5\219\82\234\72\192\137\41","\224\77\174\63\139\38\175"));v358=v9.CurrentCamera;v356=1 + 0 ;end if (v356==1) then if (v164 and v163 and v357) then local v452=0;local v453;local v454;local v455;while true do if (v452==2) then if v165 then v455=v453;elseif v166 then v455= -v453;end if ((v454.Magnitude>0) or v165 or v166) then local v485=Vector3.new(0 -0 ,290 -(23 + 267) ,0);if (v454.Magnitude>0) then local v494=v358.CFrame:VectorToObjectSpace(v454);v485=(v358.CFrame.LookVector *  -v494.Z) + (v358.CFrame.RightVector * v494.X) ;end v163.velocity=(v485 * v453) + Vector3.new(0,v455,1944 -(1129 + 815) ) ;else v163.velocity=Vector3.new(387 -(371 + 16) ,1750 -(1326 + 424) ,0 -0 );end break;end if (v452==(0 -0)) then v164.cframe=v358.CFrame;v453=tonumber(v100.Text) or (168 -(88 + 30)) ;v452=772 -(720 + 51) ;end if (v452==1) then local v480=0;while true do if (v480==(0 -0)) then v454=v357.MoveDirection;v455=0;v480=1777 -(421 + 1355) ;end if (v480==1) then v452=2;break;end end end end end break;end end break;end end end break;end end end end);v117.MouseButton1Click:Connect(function() v19= not v19;v117.Text=v7("\175\72\84\34\196\96\77\60\133\27\24","\78\228\33\56")   .. ((v19 and v7("\225\80","\229\174\30\210\99")) or v7("\52\203\160","\89\123\141\230\49\141\93")) ;end);task.spawn(function() while v14 do local v246=0;while true do if (0==v246) then if v19 then pcall(function() local v359=0 -0 ;local v360;local v361;local v362;local v363;while true do if (v359==0) then v360=v13.Character;if ( not v360 or  not v360:FindFirstChild(v7("\219\100\251\13\30\69\250\117\196\3\31\94\195\112\228\24","\42\147\17\150\108\112"))) then return;end v359=1 + 0 ;end if ((1084 -(286 + 797))==v359) then v361=v360.HumanoidRootPart.Position;v362=tonumber(v109.Text) or (91 -66) ;v359=2 -0 ;end if (v359==2) then v363=v360:FindFirstChildOfClass(v7("\59\169\34\115","\136\111\198\77\31\135"));if v363 then for v435,v436 in pairs(v9:GetChildren()) do if (v436:IsA(v7("\47\6\163\83\177","\201\98\105\199\54\221\132\119")) and (v436~=v360) and v436:FindFirstChildOfClass(v7("\145\25\142\32\12\58\165\189","\204\217\108\227\65\98\85"))) then local v456=439 -(397 + 42) ;local v457;while true do if (v456==(0 + 0)) then v457=v436:FindFirstChildOfClass(v7("\118\214\248\228\34\207\87\199","\160\62\163\149\133\76"));if (v457 and (v457.Health>0) and  not v8:GetPlayerFromCharacter(v436)) then local v488=0;local v489;while true do if (v488==(800 -(24 + 776))) then v489=v436:FindFirstChild(v7("\254\181\0\46\205\217\169\9\29\204\217\180\61\46\209\194","\163\182\192\109\79")) or v436.PrimaryPart ;if v489 then local v508=0 -0 ;local v509;while true do if (v508==(785 -(222 + 563))) then v509=(v361-v489.Position).Magnitude;if (v509<=v362) then local v512=0 -0 ;local v513;while true do if ((0 + 0)==v512) then v363:Activate();v513=v363:FindFirstChild(v7("\28\39\14\196\249\49","\149\84\70\96\160")) or v363:FindFirstChildWhichIsA(v7("\26\7\30\232\8\7\31\249","\141\88\102\109")) ;v512=1;end if (v512==1) then if v513 then local v514=190 -(23 + 167) ;local v515;while true do if (0==v514) then v515=0;while true do if ((1798 -(690 + 1108))==v515) then firetouchinterest(v513,v489,0 + 0 );firetouchinterest(v513,v489,1);break;end end break;end end end break;end end end break;end end end break;end end end break;end end end end end break;end end end);end task.wait(0.2);break;end end end end);v10.Stepped:Connect(function() if (v20 and v14) then local v264=0 + 0 ;local v265;while true do if (v264==0) then v265=v13.Character;if v265 then for v386,v387 in pairs(v265:GetDescendants()) do if v387:IsA(v7("\145\82\217\117\42\60\71\213","\161\211\51\170\16\122\93\53")) then v387.CanCollide=false;end end end break;end end end end);local function v168(v235) for v247,v248 in pairs(v9:GetDescendants()) do local v249=0;local v250;while true do if ((848 -(40 + 808))==v249) then v250=v248:FindFirstChild(v235);if v250 then v250:Destroy();end break;end end end end local function v169() local v236=0;while true do if (v236==(0 + 0)) then v14=false;v15,v16,v17,v18,v19,v20,v21=false,false,false,false,false,false,false;v22,v24,v26,v28=false,false,false,false;v167();v236=1;end if (v236==2) then v168(v7("\118\39\4\110\81\16\47\74\81\16\47\82","\38\56\119\71"));v168(v7("\221\223\123\226\32\78\231\200\77\223","\54\147\143\56\182\69"));v33:Destroy();break;end if (v236==1) then v12.Ambient=v29;v12.OutdoorAmbient=v30;v168(v7("\222\157\130\0\242\169\186\36\242\169\186\60","\72\155\206\210"));v168(v7("\99\73\100\58\54\94\110\115\27\58","\83\38\26\52\110"));v236=7 -5 ;end end end v64.MouseButton1Click:Connect(v169);v118.MouseButton1Click:Connect(function() v16= not v16;v118.Text="Auto Lụm: "   .. ((v16 and v7("\249\175","\191\182\225\159\41")) or v7("\4\52\14","\162\75\114\72\53\235\231")) ;end);v122.MouseButton1Click:Connect(function() v20= not v20;v122.Text=v7("\162\51\71\238\90\18\214\124","\98\236\92\36\130\51")   .. ((v20 and v7("\139\55","\80\196\121\108\218\37\200\213")) or v7("\47\85\36","\234\96\19\98\31\43\110")) ;end);v119.MouseButton1Click:Connect(function() local v239=0;local v240;while true do if (v239==(0 + 0)) then v240=0;while true do if (v240==(0 + 0)) then v17= not v17;v119.Text=v7("\35\44\98\135\133\102\142\11\69\18","\235\102\127\50\167\204\18")   .. ((v17 and v7("\127\143","\78\48\193\149\67\36")) or v7("\31\56\166","\33\80\126\224\120")) ;v240=1;end if (v240==(1 + 0)) then if  not v17 then local v388=571 -(47 + 524) ;while true do if (v388==0) then v168(v7("\201\155\51\236\85\235\160\15\205\91\228\188","\60\140\200\99\164"));v168(v7("\162\199\52\18\167\159\224\35\51\171","\194\231\148\100\70"));break;end end end break;end end break;end end end);v120.MouseButton1Click:Connect(function() local v241=0 + 0 ;while true do if (v241==(0 -0)) then v18= not v18;v120.Text="ESP NPC (Đỏ): "   .. ((v18 and v7("\105\98","\168\38\44\161\195\150")) or v7("\175\218\164","\118\224\156\226\22\80\136\214")) ;v241=1 -0 ;end if (1==v241) then if  not v18 then v168(v7("\108\222\122\168\75\233\81\140\75\233\81\148","\224\34\142\57"));v168(v7("\240\151\230\233\118\233\73\41\203\174","\110\190\199\165\189\19\145\61"));end break;end end end);v121.MouseButton1Click:Connect(function() local v242=0 -0 ;while true do if ((1727 -(1165 + 561))==v242) then if v21 then local v322=0;local v323;while true do if (v322==(0 + 0)) then v323=0;while true do if (v323==(0 -0)) then v12.Ambient=Color3.new(1 + 0 ,480 -(341 + 138) ,1 + 0 );v12.OutdoorAmbient=Color3.new(1 -0 ,327 -(89 + 237) ,3 -2 );break;end end break;end end else v12.Ambient=v29;v12.OutdoorAmbient=v30;end break;end if (v242==0) then v21= not v21;v121.Text=v7("\252\254\123\228\203\229\200\226\112\224\159\157\154","\167\186\139\23\136\235")   .. ((v21 and v7("\53\155","\109\122\213\232")) or v7("\193\209\132","\80\142\151\194")) ;v242=1;end end end);task.spawn(function() while v14 do if v16 then pcall(function() local v306=v13.Character;if (v306 and v306:FindFirstChild(v7("\43\211\122\77\13\201\126\72\49\201\120\88\51\199\101\88","\44\99\166\23"))) then local v339=0;local v340;local v341;local v342;local v343;local v344;while true do if (v339==(1 -0)) then v342=nil;v343=nil;v339=883 -(581 + 300) ;end if (v339==(1220 -(855 + 365))) then v340=0 -0 ;v341=nil;v339=1 + 0 ;end if (v339==(1237 -(1030 + 205))) then v344=nil;while true do if (v340==2) then v343.FilterDescendantsInstances={v306};v344=v9:GetPartBoundsInRadius(v342,25,v343);v340=3 + 0 ;end if (v340==(289 -(156 + 130))) then for v437,v438 in ipairs(v344) do local v439=0 -0 ;local v440;while true do if (v439==0) then v440=v438.Parent;if (v31[v438.Name] or (v440 and v31[v440.Name])) then local v481=v438:FindFirstChildWhichIsA(v7("\76\229\38\46\58\169\117\227\48\6\33\171\113\231\61","\196\28\151\73\86\83"),true) or (v440 and v440:FindFirstChildWhichIsA(v7("\195\17\38\8\139\85\17\98\234\51\59\31\143\72\12","\22\147\99\73\112\226\56\120"),true)) ;if v481 then local v490=0;local v491;while true do if (v490==(0 -0)) then v491=0 -0 ;while true do if (v491==(0 + 0)) then v481.HoldDuration=0 + 0 ;fireproximityprompt(v481);break;end end break;end end else local v492=69 -(10 + 59) ;while true do if ((0 + 0)==v492) then firetouchinterest(v341,v438,0);firetouchinterest(v341,v438,4 -3 );break;end end end end break;end end end break;end if (v340==0) then v341=v306.HumanoidRootPart;v342=v341.Position;v340=1164 -(671 + 492) ;end if (v340==(1 + 0)) then local v410=1215 -(369 + 846) ;while true do if (v410==0) then v343=OverlapParams.new();v343.FilterType=Enum.RaycastFilterType.Exclude;v410=1 + 0 ;end if (v410==(1 + 0)) then v340=2;break;end end end end break;end end end end);end task.wait(1945.2 -(1036 + 909) );end end);task.spawn(function() while v14 do if v17 then pcall(function() local v307=v13.Character;if ( not v307 or  not v307:FindFirstChild(v7("\144\96\239\244\131\183\124\230\199\130\183\97\210\244\159\172","\237\216\21\130\149"))) then return;end local v308=v307.HumanoidRootPart.Position;for v326,v327 in pairs(v9:GetChildren()) do if ( not v14 or  not v17) then break;end if (v327:IsA(v7("\160\79\76\90\128\200\76\150","\62\226\46\63\63\208\169")) and v31[v327.Name]) then local v364=(v308-v327.Position).Magnitude;local v365=v327:FindFirstChild(v7("\192\42\101\171\22\10\39\82\236\30\93\151","\62\133\121\53\227\127\109\79")) or Instance.new(v7("\56\29\53\253\218\167\165\24\0","\194\112\116\82\149\182\206"),v327) ;v365.Name=v7("\28\155\124\48\201\229\6\53\161\75\16\212","\110\89\200\44\120\160\130");v365.FillColor=Color3.fromRGB(203 + 52 ,255,0 -0 );v365.OutlineColor=Color3.fromRGB(255,458 -(11 + 192) ,129 + 126 );v365.Enabled=true;local v370=v327:FindFirstChild(v7("\142\240\123\114\70\82\47\106\190\202","\45\203\163\43\38\35\42\91"));if  not v370 then local v394=175 -(135 + 40) ;local v395;while true do if (v394==(2 -1)) then v370.ExtentsOffset=Vector3.new(0 + 0 ,4 -2 ,0);v395=Instance.new(v7("\235\226\182\204\223\222\229\171\212","\147\191\135\206\184"),v370);v395.Name=v7("\161\27\150\237\217\81\183\136","\210\228\72\198\161\184\51");v395.Size=UDim2.new(1,0 -0 ,1,176 -(50 + 126) );v394=5 -3 ;end if (v394==(0 + 0)) then v370=Instance.new(v7("\240\140\208\47\133\166\85\192\129\251\54\142","\52\178\229\188\67\231\201"),v327);v370.Name=v7("\4\114\96\48\242\68\55\6\84\89","\67\65\33\48\100\151\60");v370.Size=UDim2.new(1413 -(1233 + 180) ,150,969 -(522 + 447) ,1451 -(107 + 1314) );v370.AlwaysOnTop=true;v394=1 + 0 ;end if (v394==2) then v395.BackgroundTransparency=2 -1 ;v395.TextColor3=Color3.fromRGB(109 + 146 ,255,0);v395.TextStrokeTransparency=0 -0 ;v395.TextSize=43 -32 ;v394=1913 -(716 + 1194) ;end if (v394==3) then v395.Font=Enum.Font.GothamBold;break;end end end v370.Enabled=true;v370.ESPLabel.Text=string.format(v7("\115\90\179\43\54\202\59\116","\174\86\41\147\112\19"),v327.Name,math.floor(v364));end end end);end task.wait(1);end end);task.spawn(function() while v14 do local v251=0 + 0 ;while true do if (v251==0) then if v18 then pcall(function() local v373=v13.Character;if ( not v373 or  not v373:FindFirstChild(v7("\115\21\128\10\43\0\24\175\105\15\130\31\21\14\3\191","\203\59\96\237\107\69\111\113"))) then return;end local v374=v373.HumanoidRootPart.Position;for v389,v390 in pairs(v9:GetChildren()) do if  not v14 then break;end if (v390:IsA(v7("\9\25\168\228\61","\183\68\118\204\129\81\144")) and (v390~=v373) and v390:FindFirstChildOfClass(v7("\38\184\125\229\5\141\7\169","\226\110\205\16\132\107"))) then if  not v8:GetPlayerFromCharacter(v390) then local v423=v390:FindFirstChild(v7("\195\214\237\216\79\228\202\228\235\78\228\215\208\216\83\255","\33\139\163\128\185")) or v390:FindFirstChild(v7("\127\93\5\218","\190\55\56\100")) or v390.PrimaryPart ;if v423 then local v442=0 + 0 ;local v443;local v444;local v445;while true do if (v442==(506 -(74 + 429))) then v445.Enabled=true;v445.NPCLabel.Text=string.format(v7("\152\98\177\63\129\79\230\95\193\39\249\11\174\113","\111\195\44\225\124\220"),v390.Name,math.floor(v443));break;end if (v442==0) then v443=(v374-v423.Position).Magnitude;v444=v390:FindFirstChild(v7("\120\159\31\54\26\228\251\90\166\59\22\7","\147\54\207\92\126\115\131")) or Instance.new(v7("\37\56\50\117\1\119\10\57\33","\30\109\81\85\29\109"),v390) ;v444.Name=v7("\209\65\119\158\63\217\244\243\120\83\190\34","\156\159\17\52\214\86\190");v442=1;end if (1==v442) then v444.FillColor=Color3.fromRGB(491 -236 ,0 + 0 ,0 -0 );v444.OutlineColor=Color3.fromRGB(150,0 + 0 ,0 -0 );v444.FillTransparency=0.4 -0 ;v442=435 -(279 + 154) ;end if (v442==(780 -(454 + 324))) then v444.Enabled=true;v445=v423:FindFirstChild(v7("\128\223\158\136\171\247\169\155\187\230","\220\206\143\221"));if  not v445 then local v482=0;local v483;while true do if (v482==2) then v483.BackgroundTransparency=1;v483.TextColor3=Color3.fromRGB(201 + 54 ,50,50);v483.TextStrokeTransparency=17 -(12 + 5) ;v483.TextSize=12;v482=3;end if (v482==3) then v483.Font=Enum.Font.GothamBold;break;end if (v482==(0 + 0)) then v445=Instance.new(v7("\164\116\33\27\218\195\211\148\121\10\2\209","\178\230\29\77\119\184\172"),v423);v445.Name=v7("\219\142\41\47\114\224\225\153\31\18","\152\149\222\106\123\23");v445.Size=UDim2.new(0,382 -232 ,0 + 0 ,1123 -(277 + 816) );v445.AlwaysOnTop=true;v482=1;end if ((4 -3)==v482) then v445.ExtentsOffset=Vector3.new(1183 -(1058 + 125) ,1.5 + 1 ,975 -(815 + 160) );v483=Instance.new(v7("\233\35\238\87\153\220\36\243\79","\213\189\70\150\35"),v445);v483.Name=v7("\97\101\87\36\78\87\113\4","\104\47\53\20");v483.Size=UDim2.new(4 -3 ,0 -0 ,1 + 0 ,0 -0 );v482=2;end end end v442=1901 -(41 + 1857) ;end end end end end end end);end task.wait(1);break;end end end end);local v170=false;task.spawn(function() while v14 do local v252=1893 -(1222 + 671) ;while true do if (v252==(0 -0)) then pcall(function() local v328=v13.Character;if (v328 and v328:FindFirstChildOfClass(v7("\240\83\13\114\165\164\209\66","\203\184\38\96\19\203"))) then local v375=0 -0 ;local v376;while true do if (v375==(1183 -(229 + 953))) then if ((v376.Health<v376.MaxHealth) and (v376.Health>(1774 -(1111 + 663))) and  not v170) then v170=true;local v424=v328:FindFirstChild(v7("\17\102\116\64\192\54\122\125\115\193\54\103\73\64\220\45","\174\89\19\25\33"));if v424 then local v446=v424.Position;local v447=nil;local v448=math.huge;for v460,v461 in pairs(v9:GetDescendants()) do if (v461:IsA(v7("\28\23\83\90","\107\79\114\50\46\151\231")) or v461:IsA(v7("\15\163\189\32\137\53\178\243\60\167\161","\160\89\198\213\73\234\89\215"))) then local v475=(v446-v461.Position).Magnitude;if ((v475<(1879 -(874 + 705))) and (v475<v448)) then local v484=0 + 0 ;while true do if (v484==(0 + 0)) then v448=v475;v447=v461;break;end end end end end if v447 then v424.CFrame=v447.CFrame + Vector3.new(0 -0 ,1 + 2 ,679 -(642 + 37) ) ;end end end break;end if (v375==(0 + 0)) then v376=v328.Humanoid;if (v376.Health>=v376.MaxHealth) then v170=false;end v375=1;end end end end);task.wait(0.5 + 0 );break;end end end end);v10.Stepped:Connect(function() if (v26 and v14) then pcall(function() local v297=v13.Character;if (v297 and v297:FindFirstChild(v7("\96\100\185\255\203\71\120\176","\165\40\17\212\158"))) then local v329=v297.Humanoid.SeatPart;if (v329 and v329:IsA(v7("\211\220\0\58\37\233\220\59\54\39\241","\70\133\185\104\83"))) then local v377=0 -0 ;local v378;local v379;while true do if ((455 -(233 + 221))==v377) then if (v329.Throttle~=(0 -0)) then local v425=0;local v426;while true do if (0==v425) then v426=v379.CFrame.LookVector * v329.Throttle * v27 ;v379.AssemblyLinearVelocity=Vector3.new(v426.X,v379.AssemblyLinearVelocity.Y,v426.Z);break;end end end break;end if (v377==0) then v378=v329:FindFirstAncestorOfClass(v7("\41\74\64\47\197","\169\100\37\36\74")) or v329 ;v379=v378.PrimaryPart or v329 ;v377=1;end end end end end);end end);task.spawn(function() while v14 do local v253=0 + 0 ;while true do if (v253==0) then pcall(function() local v330=1541 -(718 + 823) ;local v331;while true do if (v330==0) then v331=v13.Character;if (v331 and v331:FindFirstChild(v7("\40\146\175\81\14\136\171\84","\48\96\231\194"))) then if v22 then v331.Humanoid.WalkSpeed=v23;end if v24 then v331.Humanoid.UseJumpPower=true;v331.Humanoid.JumpPower=v25;end end break;end end end);task.wait(0.1 + 0 );break;end end end end);task.spawn(function() while v14 do local v254=0;while true do if ((805 -(266 + 539))==v254) then if v28 then pcall(function() local v380=0;local v381;while true do if (v380==0) then v381=v13.Character;if (v381 and v381:FindFirstChild(v7("\224\79\3\44\23\215\166\135","\227\168\58\110\77\121\184\207"))) then local v430=v381.Humanoid.SeatPart;if (v430 and v430:IsA(v7("\77\57\183\73\178\215\116\150\126\61\171","\197\27\92\223\32\209\187\17"))) then local v449=v430:FindFirstAncestorOfClass(v7("\46\80\199\254\15","\155\99\63\163")) or v430 ;for v463,v464 in pairs(v449:GetDescendants()) do if (v464:IsA(v7("\172\196\172\143\188\150\180\208\173\152\188","\228\226\177\193\237\217")) or v464:IsA(v7("\29\190\55\208\53\188\54\227","\134\84\208\67"))) then local v476=0 -0 ;local v477;while true do if (v476==(1225 -(636 + 589))) then v477=string.lower(v464.Name);if (v477:find(v7("\21\185\131\80","\60\115\204\230")) or v477:find(v7("\224\59\248","\16\135\90\139")) or v477:find(v7("\76\117\8\52","\24\52\20\102\83\46\52")) or v477:find(v7("\193\33\36\54\8\221","\111\164\79\65\68"))) then v464.Value=100;end break;end end end end end end break;end end end);end task.wait(0.5 -0 );break;end end end end);
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+
+-- Trạng thái tổng
+local scriptRunning = true
+local flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
+
+-- Trạng thái & Giá trị cấu hình
+local speedOn = false
+local speedValue = 32
+
+local jumpOn = false
+local jumpValue = 100
+
+local boatSpeedOn = false
+local boatSpeedValue = 150
+
+local noFuelBoatOn = false
+
+local defaultAmbient = Lighting.Ambient
+local defaultOutdoor = Lighting.OutdoorAmbient
+
+local LootNames = {
+    ["Scrap"] = true, ["Gold"] = true, ["Chest"] = true, ["La bàn"] = true,
+    ["Compass"] = true, ["Coin"] = true, ["Loot"] = true, ["Item"] = true, ["Treasure"] = true,
+    ["Thùng"] = true, ["Thung"] = true, ["Barrel"] = true, ["Crate"] = true, ["Box"] = true,
+    ["Dây"] = true, ["Day"] = true, ["Rope"] = true, ["String"] = true, ["Cable"] = true
+}
+
+-- HOOK CHẶN REMOTEEVENT TRỪ NHIÊN LIỆU
+pcall(function()
+    local rawmetatable = getrawmetatable(game)
+    local oldNamecall = rawmetatable.__namecall
+    setreadonly(rawmetatable, false)
+
+    rawmetatable.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        if method == "FireServer" and self then
+            local name = string.lower(self.Name)
+            if name:find("fuel") or name:find("gas") or name:find("consume") or name:find("xang") or name:find("drain") or name:find("use") then
+                return nil 
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(rawmetatable, true)
+end)
+
+-- Hàm Kéo Thả UI
+local function MakeDraggable(gui)
+    local dragging, dragInput, dragStart, startPos
+    gui.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = gui.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    gui.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- UI Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "StrawberryHubGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 450, 0, 270)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -135)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BackgroundTransparency = 0.3
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+MakeDraggable(MainFrame)
+
+local UIStroke = Instance.new("UIStroke", MainFrame)
+UIStroke.Thickness = 2
+
+task.spawn(function()
+    while scriptRunning do
+        for i = 0, 1, 0.05 do 
+            if not scriptRunning then break end
+            UIStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.1) 
+        end
+    end
+end)
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Text = "Strawberry / LostCurrents - by nguyen"
+Title.Size = UDim2.new(0, 300, 0, 25)
+Title.Position = UDim2.new(0.02, 0, 0.02, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextSize = 12
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+local HideBtn = Instance.new("TextButton", MainFrame)
+HideBtn.Text = "-"
+HideBtn.Size = UDim2.new(0, 22, 0, 22)
+HideBtn.Position = UDim2.new(1, -52, 0.02, 0)
+HideBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+HideBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", HideBtn).CornerRadius = UDim.new(0, 4)
+
+local CloseBtn = Instance.new("TextButton", MainFrame)
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 22, 0, 22)
+CloseBtn.Position = UDim2.new(1, -26, 0.02, 0)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
+
+local FloatBtn = Instance.new("ImageButton", ScreenGui)
+FloatBtn.Name = "OpenButton"
+FloatBtn.Size = UDim2.new(0, 45, 0, 45)
+FloatBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+FloatBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+FloatBtn.BackgroundTransparency = 0.3
+FloatBtn.Image = "rbxassetid://88285387138547"
+FloatBtn.Visible = false
+Instance.new("UICorner", FloatBtn).CornerRadius = UDim.new(1, 0)
+MakeDraggable(FloatBtn)
+
+local FloatStroke = Instance.new("UIStroke", FloatBtn)
+FloatStroke.Thickness = 2
+task.spawn(function()
+    while scriptRunning do
+        for i = 0, 1, 0.05 do 
+            if not scriptRunning then break end
+            FloatStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.1) 
+        end
+    end
+end)
+
+HideBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; FloatBtn.Visible = true end)
+FloatBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatBtn.Visible = false end)
+
+-- Sidebar Tabs
+local Sidebar = Instance.new("Frame", MainFrame)
+Sidebar.Size = UDim2.new(0, 100, 1, -35)
+Sidebar.Position = UDim2.new(0, 8, 0, 30)
+Sidebar.BackgroundTransparency = 1
+
+local function CreateTabButton(text, y)
+    local b = Instance.new("TextButton", Sidebar)
+    b.Text = text
+    b.Size = UDim2.new(1, 0, 0, 28)
+    b.Position = UDim2.new(0, 0, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    b.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
+    return b
+end
+
+local TabMainBtn = CreateTabButton("Main", 0)
+local TabMiscBtn = CreateTabButton("Misc", 34)
+local TabTPBtn = CreateTabButton("TP", 68)
+
+TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
+
+local function CreateContainer()
+    local c = Instance.new("Frame", MainFrame)
+    c.Size = UDim2.new(1, -124, 1, -38)
+    c.Position = UDim2.new(0, 116, 0, 30)
+    c.BackgroundTransparency = 1
+    return c
+end
+
+local MainContainer = CreateContainer()
+local MiscContainer = CreateContainer(); MiscContainer.Visible = false
+local TPContainer = CreateContainer(); TPContainer.Visible = false
+
+local function SetTab(activeBtn, activeContainer)
+    MainContainer.Visible = false; MiscContainer.Visible = false; TPContainer.Visible = false
+    TabMainBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMainBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    TabTPBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabTPBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+
+    activeContainer.Visible = true
+    activeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    activeBtn.TextColor3 = Color3.new(1, 1, 1)
+end
+
+TabMainBtn.MouseButton1Click:Connect(function() SetTab(TabMainBtn, MainContainer) end)
+TabMiscBtn.MouseButton1Click:Connect(function() SetTab(TabMiscBtn, MiscContainer) end)
+TabTPBtn.MouseButton1Click:Connect(function() SetTab(TabTPBtn, TPContainer) end)
+
+local function CreateButton(text, y, parent, widthScale, xPos)
+    local b = Instance.new("TextButton", parent)
+    b.Text = text
+    b.Size = UDim2.new(widthScale or 1, 0, 0, 24)
+    b.Position = UDim2.new(xPos or 0, 0, y, 0)
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
+    return b
+end
+
+-- TAB MAIN
+local FlySpeedInput = Instance.new("TextBox", MainContainer)
+FlySpeedInput.PlaceholderText = "Vận tốc Fly (VD: 50)"
+FlySpeedInput.Text = "50"
+FlySpeedInput.Size = UDim2.new(0.48, 0, 0, 24)
+FlySpeedInput.Position = UDim2.new(0, 0, 0, 0)
+FlySpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+FlySpeedInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", FlySpeedInput).CornerRadius = UDim.new(0, 4)
+
+local FlyBtn = CreateButton("Fly: OFF", 0, MainContainer, 0.48, 0.52)
+
+local KillDistInput = Instance.new("TextBox", MainContainer)
+KillDistInput.PlaceholderText = "Tầm Kill Aura (VD: 25)"
+KillDistInput.Text = "25"
+KillDistInput.Size = UDim2.new(0.48, 0, 0, 24)
+KillDistInput.Position = UDim2.new(0, 0, 0.14, 0)
+KillDistInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KillDistInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", KillDistInput).CornerRadius = UDim.new(0, 4)
+
+local KillAuraBtn = CreateButton("Kill Aura: OFF", 0.14, MainContainer, 0.48, 0.52)
+local CollectBtn = CreateButton("Auto Lụm: OFF", 0.28, MainContainer, 0.48, 0)
+local ESPBtn = CreateButton("ESP Item: OFF", 0.28, MainContainer, 0.48, 0.52)
+local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.42, MainContainer, 1, 0)
+
+-- TAB MISC
+local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer, 1, 0)
+local NoclipBtn = CreateButton("Noclip: OFF", 0.13, MiscContainer, 1, 0)
+local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.26, MiscContainer, 1, 0)
+
+-- WalkSpeed
+local SpeedInput = Instance.new("TextBox", MiscContainer)
+SpeedInput.PlaceholderText = "Tốc độ chạy"
+SpeedInput.Text = tostring(speedValue)
+SpeedInput.Size = UDim2.new(0.48, 0, 0, 24)
+SpeedInput.Position = UDim2.new(0, 0, 0.39, 0)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 4)
+
+local SpeedBtn = CreateButton("WalkSpeed: OFF", 0.39, MiscContainer, 0.48, 0.52)
+
+-- JumpPower
+local JumpInput = Instance.new("TextBox", MiscContainer)
+JumpInput.PlaceholderText = "Lực nhảy"
+JumpInput.Text = tostring(jumpValue)
+JumpInput.Size = UDim2.new(0.48, 0, 0, 24)
+JumpInput.Position = UDim2.new(0, 0, 0.52, 0)
+JumpInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+JumpInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", JumpInput).CornerRadius = UDim.new(0, 4)
+
+local JumpBtn = CreateButton("JumpPower: OFF", 0.52, MiscContainer, 0.48, 0.52)
+
+-- Boat Speed
+local BoatInput = Instance.new("TextBox", MiscContainer)
+BoatInput.PlaceholderText = "Tốc độ thuyền"
+BoatInput.Text = tostring(boatSpeedValue)
+BoatInput.Size = UDim2.new(0.48, 0, 0, 24)
+BoatInput.Position = UDim2.new(0, 0, 0.65, 0)
+BoatInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+BoatInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", BoatInput).CornerRadius = UDim.new(0, 4)
+
+local BoatSpeedBtn = CreateButton("Boat Speed: OFF", 0.65, MiscContainer, 0.48, 0.52)
+
+-- Infinite Fuel
+local NoFuelBtn = CreateButton("Băng Nhiên Liệu (No-Fuel): OFF", 0.78, MiscContainer, 1, 0)
+
+-- Cập nhật thông số từ TextBox
+SpeedInput.FocusLost:Connect(function() local v = tonumber(SpeedInput.Text); if v then speedValue = v else SpeedInput.Text = tostring(speedValue) end end)
+JumpInput.FocusLost:Connect(function() local v = tonumber(JumpInput.Text); if v then jumpValue = v else JumpInput.Text = tostring(jumpValue) end end)
+BoatInput.FocusLost:Connect(function() local v = tonumber(BoatInput.Text); if v then boatSpeedValue = v else BoatInput.Text = tostring(boatSpeedValue) end end)
+
+SpeedBtn.MouseButton1Click:Connect(function() 
+    speedOn = not speedOn 
+    SpeedBtn.Text = "WalkSpeed: "..(speedOn and "ON" or "OFF") 
+    if not speedOn and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then 
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16 
+    end 
+end) 
+
+JumpBtn.MouseButton1Click:Connect(function() 
+    jumpOn = not jumpOn 
+    JumpBtn.Text = "JumpPower: "..(jumpOn and "ON" or "OFF") 
+    if not jumpOn and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then 
+        LocalPlayer.Character.Humanoid.UseJumpPower = true 
+        LocalPlayer.Character.Humanoid.JumpPower = 50 
+    end 
+end) 
+
+BoatSpeedBtn.MouseButton1Click:Connect(function() 
+    boatSpeedOn = not boatSpeedOn 
+    BoatSpeedBtn.Text = "Boat Speed: "..(boatSpeedOn and "ON" or "OFF") 
+end)
+
+NoFuelBtn.MouseButton1Click:Connect(function()
+    noFuelBoatOn = not noFuelBoatOn
+    NoFuelBtn.Text = "Băng Nhiên Liệu (No-Fuel): "..(noFuelBoatOn and "ON" or "OFF")
+end)
+
+-- TAB TELEPORT
+local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer, 1, 0)
+local PirateBaseBtn = CreateButton("Base hải tặc", 0.14, TPContainer, 1, 0)
+
+local CustomTPInput = Instance.new("TextBox", TPContainer)
+CustomTPInput.PlaceholderText = "X, Y, Z (VD: 100, 50, -200)"
+CustomTPInput.Size = UDim2.new(1, 0, 0, 24)
+CustomTPInput.Position = UDim2.new(0, 0, 0.28, 0)
+CustomTPInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+CustomTPInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
+
+local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.42, TPContainer, 1, 0)
+
+local function TeleportTo(x, y, z)
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
+    end
+end
+
+SpecificTPBtn.MouseButton1Click:Connect(function() TeleportTo(1230, 220, 60) end)
+PirateBaseBtn.MouseButton1Click:Connect(function() TeleportTo(-2500, 250, -1500) end)
+
+CustomTPBtn.MouseButton1Click:Connect(function()
+    local text = CustomTPInput.Text
+    local coords = {}
+    for num in string.gmatch(text, "[-?%d%.]+") do table.insert(coords, tonumber(num)) end
+    if #coords >= 3 then TeleportTo(coords[1], coords[2], coords[3]) end
+end)
+
+-- LOGIC FIX LAG
+FixLagBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 0
+        for _, v in pairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("BloomEffect") then
+                v.Enabled = false
+            end
+        end
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsA("MeshPart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.Reflectance = 0
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj:Destroy()
+            elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+                obj.Enabled = false
+            end
+        end
+    end)
+    FixLagBtn.Text = "Đã Fix Lag!"
+    task.wait(1.5)
+    FixLagBtn.Text = "Fix Lag (Boost FPS)"
+end)
+
+-- LOGIC FLY
+local flyBV, flyBG = nil, nil
+local upPressed, downPressed = false, false
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.Space then upPressed = true
+    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then downPressed = true end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.Space then upPressed = false
+    elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then downPressed = false end
+end)
+
+local function StopFly()
+    if flyBG then flyBG:Destroy(); flyBG = nil end
+    if flyBV then flyBV:Destroy(); flyBV = nil end
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = false end
+    end
+end
+
+FlyBtn.MouseButton1Click:Connect(function()
+    flyOn = not flyOn
+    FlyBtn.Text = "Fly: "..(flyOn and "ON" or "OFF")
+
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+
+    if flyOn then
+        if root and hum then
+            flyBG = Instance.new("BodyGyro", root)
+            flyBG.P = 9e4
+            flyBG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+            flyBG.cframe = root.CFrame
+
+            flyBV = Instance.new("BodyVelocity", root)
+            flyBV.velocity = Vector3.new(0, 0, 0)
+            flyBV.maxForce = Vector3.new(9e9, 9e9, 9e9)
+
+            hum.PlatformStand = true
+        end
+    else
+        StopFly()
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if flyOn and scriptRunning then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            local cam = Workspace.CurrentCamera
+
+            if flyBG and flyBV and hum then
+                flyBG.cframe = cam.CFrame
+                local speed = tonumber(FlySpeedInput.Text) or 50
+                local moveDir = hum.MoveDirection
+
+                local verticalVelocity = 0
+                if upPressed then verticalVelocity = speed
+                elseif downPressed then verticalVelocity = -speed end
+
+                if moveDir.Magnitude > 0 or upPressed or downPressed then
+                    local finalDir = Vector3.new(0, 0, 0)
+                    if moveDir.Magnitude > 0 then
+                        local relativeMove = cam.CFrame:VectorToObjectSpace(moveDir)
+                        finalDir = (cam.CFrame.LookVector * -relativeMove.Z) + (cam.CFrame.RightVector * relativeMove.X)
+                    end
+                    flyBV.velocity = (finalDir * speed) + Vector3.new(0, verticalVelocity, 0)
+                else
+                    flyBV.velocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+    end
+end)
+
+-- LOGIC KILL AURA
+KillAuraBtn.MouseButton1Click:Connect(function()
+    killAuraOn = not killAuraOn
+    KillAuraBtn.Text = "Kill Aura: "..(killAuraOn and "ON" or "OFF")
+end)
+
+task.spawn(function()
+    while scriptRunning do
+        if killAuraOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPos = char.HumanoidRootPart.Position
+                local maxDist = tonumber(KillDistInput.Text) or 25
+                local equippedTool = char:FindFirstChildOfClass("Tool")
+
+                if equippedTool then
+                    for _, model in pairs(Workspace:GetChildren()) do
+                        if model:IsA("Model") and model ~= char and model:FindFirstChildOfClass("Humanoid") then
+                            local hum = model:FindFirstChildOfClass("Humanoid")
+                            if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(model) then
+                                local npcRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
+                                if npcRoot then
+                                    local dist = (rootPos - npcRoot.Position).Magnitude
+                                    if dist <= maxDist then
+                                        equippedTool:Activate()
+                                        local handle = equippedTool:FindFirstChild("Handle") or equippedTool:FindFirstChildWhichIsA("BasePart")
+                                        if handle then
+                                            firetouchinterest(handle, npcRoot, 0)
+                                            firetouchinterest(handle, npcRoot, 1)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- LOGIC NOCLIP
+RunService.Stepped:Connect(function()
+    if noclipOn and scriptRunning then
+        local char = LocalPlayer.Character
+        if char then
+            for _, child in pairs(char:GetDescendants()) do
+                if child:IsA("BasePart") then child.CanCollide = false end
+            end
+        end
+    end
+end)
+
+-- HÀM DỌN DẸP ESP
+local function ClearESP(tag)
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        local target = obj:FindFirstChild(tag)
+        if target then target:Destroy() end
+    end
+end
+
+-- CLEANUP KHI TẮT GUI
+local function CleanupAll()
+    scriptRunning = false
+    flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
+    speedOn, jumpOn, boatSpeedOn, noFuelBoatOn = false, false, false, false
+
+    StopFly()
+
+    Lighting.Ambient = defaultAmbient
+    Lighting.OutdoorAmbient = defaultOutdoor
+
+    ClearESP("ESPHighlight")
+    ClearESP("ESPTextGui")
+    ClearESP("NPCHighlight")
+    ClearESP("NPCTextGui")
+
+    ScreenGui:Destroy()
+end
+
+CloseBtn.MouseButton1Click:Connect(CleanupAll)
+
+CollectBtn.MouseButton1Click:Connect(function() collectOn = not collectOn; CollectBtn.Text = "Auto Lụm: "..(collectOn and "ON" or "OFF") end)
+NoclipBtn.MouseButton1Click:Connect(function() noclipOn = not noclipOn; NoclipBtn.Text = "Noclip: "..(noclipOn and "ON" or "OFF") end)
+
+ESPBtn.MouseButton1Click:Connect(function() 
+    espOn = not espOn
+    ESPBtn.Text = "ESP Item: "..(espOn and "ON" or "OFF")
+    if not espOn then
+        ClearESP("ESPHighlight")
+        ClearESP("ESPTextGui")
+    end
+end)
+
+ESPNpcBtn.MouseButton1Click:Connect(function()
+    espNpcOn = not espNpcOn
+    ESPNpcBtn.Text = "ESP NPC (Đỏ): "..(espNpcOn and "ON" or "OFF")
+    if not espNpcOn then
+        ClearESP("NPCHighlight")
+        ClearESP("NPCTextGui")
+    end
+end)
+
+BrightBtn.MouseButton1Click:Connect(function()
+    brightOn = not brightOn
+    BrightBtn.Text = "Full Bright: "..(brightOn and "ON" or "OFF")
+    if brightOn then
+        Lighting.Ambient = Color3.new(1, 1, 1); Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+    else
+        Lighting.Ambient = defaultAmbient; Lighting.OutdoorAmbient = defaultOutdoor
+    end
+end)
+
+-- ========================================================
+-- LOGIC AUTO LỤM MƯỢT MÀ (TỐI ƯU KHÔNG LAG)
+-- ========================================================
+task.spawn(function()
+    while scriptRunning do
+        if collectOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local rootPart = char.HumanoidRootPart
+                    local rootPos = rootPart.Position
+
+                    -- Quét tầm gần bằng GetPartsInPart thay vì GetDescendants toàn map
+                    local overlapParams = OverlapParams.new()
+                    overlapParams.FilterType = Enum.RaycastFilterType.Exclude
+                    overlapParams.FilterDescendantsInstances = {char}
+
+                    local nearbyParts = Workspace:GetPartBoundsInRadius(rootPos, 25, overlapParams)
+                    for _, part in ipairs(nearbyParts) do
+                        local parent = part.Parent
+                        if LootNames[part.Name] or (parent and LootNames[parent.Name]) then
+                            local prompt = part:FindFirstChildWhichIsA("ProximityPrompt", true) or (parent and parent:FindFirstChildWhichIsA("ProximityPrompt", true))
+                            if prompt then
+                                prompt.HoldDuration = 0
+                                fireproximityprompt(prompt)
+                            else
+                                firetouchinterest(rootPart, part, 0)
+                                firetouchinterest(rootPart, part, 1)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.2) -- Thời gian quét 0.2s rất nhẹ CPU
+    end
+end)
+
+-- ESP ITEM
+task.spawn(function()
+    while scriptRunning do
+        if espOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPos = char.HumanoidRootPart.Position
+                
+                for _, obj in pairs(Workspace:GetChildren()) do
+                    if not scriptRunning or not espOn then break end
+                    if obj:IsA("BasePart") and LootNames[obj.Name] then
+                        local dist = (rootPos - obj.Position).Magnitude
+                        
+                        local hl = obj:FindFirstChild("ESPHighlight") or Instance.new("Highlight", obj)
+                        hl.Name = "ESPHighlight"
+                        hl.FillColor = Color3.fromRGB(255, 255, 0)
+                        hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        hl.Enabled = true
+                        
+                        local bgui = obj:FindFirstChild("ESPTextGui")
+                        if not bgui then
+                            bgui = Instance.new("BillboardGui", obj)
+                            bgui.Name = "ESPTextGui"
+                            bgui.Size = UDim2.new(0, 150, 0, 30)
+                            bgui.AlwaysOnTop = true
+                            bgui.ExtentsOffset = Vector3.new(0, 2, 0)
+                            
+                            local textLabel = Instance.new("TextLabel", bgui)
+                            textLabel.Name = "ESPLabel"
+                            textLabel.Size = UDim2.new(1, 0, 1, 0)
+                            textLabel.BackgroundTransparency = 1
+                            textLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                            textLabel.TextStrokeTransparency = 0
+                            textLabel.TextSize = 11
+                            textLabel.Font = Enum.Font.GothamBold
+                        end
+                        bgui.Enabled = true
+                        bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
+                    end
+                end
+            end)
+        end
+        task.wait(1)
+    end
+end)
+
+-- ESP NPC MÀU ĐỎ
+task.spawn(function()
+    while scriptRunning do
+        if espNpcOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPos = char.HumanoidRootPart.Position
+
+                for _, model in pairs(Workspace:GetChildren()) do
+                    if not scriptRunning then break end
+                    if model:IsA("Model") and model ~= char and model:FindFirstChildOfClass("Humanoid") then
+                        if not Players:GetPlayerFromCharacter(model) then
+                            local npcRoot = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head") or model.PrimaryPart
+                            if npcRoot then
+                                local dist = (rootPos - npcRoot.Position).Magnitude
+                                
+                                local hl = model:FindFirstChild("NPCHighlight") or Instance.new("Highlight", model)
+                                hl.Name = "NPCHighlight"
+                                hl.FillColor = Color3.fromRGB(255, 0, 0)
+                                hl.OutlineColor = Color3.fromRGB(150, 0, 0)
+                                hl.FillTransparency = 0.4
+                                hl.Enabled = true
+
+                                local bgui = npcRoot:FindFirstChild("NPCTextGui")
+                                if not bgui then
+                                    bgui = Instance.new("BillboardGui", npcRoot)
+                                    bgui.Name = "NPCTextGui"
+                                    bgui.Size = UDim2.new(0, 150, 0, 30)
+                                    bgui.AlwaysOnTop = true
+                                    bgui.ExtentsOffset = Vector3.new(0, 2.5, 0)
+
+                                    local textLabel = Instance.new("TextLabel", bgui)
+                                    textLabel.Name = "NPCLabel"
+                                    textLabel.Size = UDim2.new(1, 0, 1, 0)
+                                    textLabel.BackgroundTransparency = 1
+                                    textLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+                                    textLabel.TextStrokeTransparency = 0
+                                    textLabel.TextSize = 12
+                                    textLabel.Font = Enum.Font.GothamBold
+                                end
+                                bgui.Enabled = true
+                                bgui.NPCLabel.Text = string.format("[NPC] %s [%dm]", model.Name, math.floor(dist))
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(1)
+    end
+end)
+
+-- Auto TP Ghế khi mất máu
+local isTeleported = false
+task.spawn(function()
+    while scriptRunning do
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                local humanoid = char.Humanoid
+                if humanoid.Health >= humanoid.MaxHealth then isTeleported = false end
+                
+                if humanoid.Health < humanoid.MaxHealth and humanoid.Health > 0 and not isTeleported then
+                    isTeleported = true
+                    local rootPart = char:FindFirstChild("HumanoidRootPart")
+                    if rootPart then
+                        local rootPos = rootPart.Position
+                        local nearestSeat = nil
+                        local shortestDist = math.huge
+                        
+                        for _, obj in pairs(Workspace:GetDescendants()) do
+                            if obj:IsA("Seat") or obj:IsA("VehicleSeat") then
+                                local dist = (rootPos - obj.Position).Magnitude
+                                if dist < 300 and dist < shortestDist then
+                                    shortestDist = dist
+                                    nearestSeat = obj
+                                end
+                            end
+                        end
+                        if nearestSeat then rootPart.CFrame = nearestSeat.CFrame + Vector3.new(0, 3, 0) end
+                    end
+                end
+            end
+        end)
+        task.wait(0.5)
+    end
+end)
+
+-- ========================================================
+-- LOGIC BOAT SPEED (ÉP VẬN TỐC VẬT LÝ THỰC TẾ TRÊN KHUNG THUYỀN)
+-- ========================================================
+RunService.Stepped:Connect(function()
+    if boatSpeedOn and scriptRunning then
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                local seat = char.Humanoid.SeatPart
+                if seat and seat:IsA("VehicleSeat") then
+                    local boatModel = seat:FindFirstAncestorOfClass("Model") or seat
+                    local mainPart = boatModel.PrimaryPart or seat
+                    
+                    if seat.Throttle ~= 0 then
+                        -- Tăng vận tốc di chuyển thẳng theo hướng nhìn thuyền
+                        local dir = mainPart.CFrame.LookVector * (seat.Throttle * boatSpeedValue)
+                        mainPart.AssemblyLinearVelocity = Vector3.new(dir.X, mainPart.AssemblyLinearVelocity.Y, dir.Z)
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- Loop: Tốc độ chạy & Lực nhảy
+task.spawn(function() 
+    while scriptRunning do 
+        pcall(function() 
+            local char = LocalPlayer.Character 
+            if char and char:FindFirstChild("Humanoid") then 
+                if speedOn then 
+                    char.Humanoid.WalkSpeed = speedValue 
+                end 
+                if jumpOn then 
+                    char.Humanoid.UseJumpPower = true 
+                    char.Humanoid.JumpPower = jumpValue 
+                end 
+            end 
+        end) 
+        task.wait(0.1) 
+    end 
+end)
+
+-- Loop: Đóng băng thuộc tính Xăng
+task.spawn(function()
+    while scriptRunning do
+        if noFuelBoatOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    local seat = char.Humanoid.SeatPart
+                    if seat and seat:IsA("VehicleSeat") then
+                        local boatModel = seat:FindFirstAncestorOfClass("Model") or seat
+                        for _, val in pairs(boatModel:GetDescendants()) do
+                            if val:IsA("NumberValue") or val:IsA("IntValue") then
+                                local name = string.lower(val.Name)
+                                if name:find("fuel") or name:find("gas") or name:find("xang") or name:find("energy") then
+                                    val.Value = 100
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
