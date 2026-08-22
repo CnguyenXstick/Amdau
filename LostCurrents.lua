@@ -57,10 +57,9 @@ local LootNames = {
 }
 
 -- Forward Declarations (Khai báo trước UI)
-local ScreenGui, MainFrame, ProfileFrame, FloatBtn, ProfileFloatBtn
+local ScreenGui, MainFrame, FloatBtn
 
 -- ===== HÀM TIỆN ÍCH =====
-
 -- Xóa tất cả ESP
 local function ClearESP(tag)
     for _, obj in pairs(Workspace:GetDescendants()) do
@@ -85,22 +84,18 @@ local function AutoHideUI()
     end
     
     UITimer = task.delay(5, function()
-        if ScriptRunning and MainFrame and ProfileFrame then
+        if ScriptRunning and MainFrame and FloatBtn then
             MainFrame.Visible = false
-            ProfileFrame.Visible = false
             FloatBtn.Visible = true
-            ProfileFloatBtn.Visible = true
         end
     end)
 end
 
 -- Hàm hiển thị UI và reset timer
 local function ShowUI()
-    if MainFrame and ProfileFrame then
+    if MainFrame and FloatBtn then
         MainFrame.Visible = true
-        ProfileFrame.Visible = true
         FloatBtn.Visible = false
-        ProfileFloatBtn.Visible = false
     end
     
     if UITimer then 
@@ -133,7 +128,6 @@ local function CleanupAll()
 end
 
 -- ===== HÀM TẠO UI =====
-
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
     
@@ -199,7 +193,6 @@ local function CreateTextBox(placeholder, text, y, parent, width, xPos)
 end
 
 -- ===== XÂY DỰNG UI =====
-
 ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "StrawberryHubGui"
 ScreenGui.ResetOnSpawn = false
@@ -277,11 +270,10 @@ task.spawn(function()
     end
 end)
 
+-- Sự kiện thu nhỏ và mở lại Menu
 HideBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
-    ProfileFrame.Visible = false
     FloatBtn.Visible = true
-    ProfileFloatBtn.Visible = true
     if UITimer then UITimer:Disconnect(); UITimer = nil end
 end)
 
@@ -431,119 +423,7 @@ task.delay(3, function()
     end
 end)
 
-local ProfileStroke = Instance.new("UIStroke", ProfileFrame)
-ProfileStroke.Thickness = 1.5
-
-task.spawn(function()
-    while ScriptRunning do
-        for i = 0, 1, 0.05 do
-            if not ScriptRunning then break end
-            ProfileStroke.Color = Color3.fromHSV(i, 1, 1)
-            task.wait(0.1)
-        end
-    end
-end)
-
-local CustomImg = Instance.new("ImageLabel", ProfileFrame)
-CustomImg.Size = UDim2.new(0, 55, 0, 55)
-CustomImg.Position = UDim2.new(0, 10, 0.5, -27.5)
-CustomImg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-CustomImg.BackgroundTransparency = 0.5
-CustomImg.Image = "rbxassetid://88285387138547"
-Instance.new("UICorner", CustomImg).CornerRadius = UDim.new(0, 8)
-
-local CustomNameLabel = Instance.new("TextLabel", ProfileFrame)
-CustomNameLabel.Size = UDim2.new(1, -75, 0, 32)
-CustomNameLabel.Position = UDim2.new(0, 70, 0, 6)
-CustomNameLabel.BackgroundTransparency = 1
-CustomNameLabel.Text = "owr: Nguyen / Builder : Nam"
-CustomNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-CustomNameLabel.TextSize = 11
-CustomNameLabel.Font = Enum.Font.GothamBold
-CustomNameLabel.TextXAlignment = Enum.TextXAlignment.Left
-CustomNameLabel.TextWrapped = true
-
-local PlayerNameLabel = Instance.new("TextLabel", ProfileFrame)
-PlayerNameLabel.Size = UDim2.new(1, -75, 0, 16)
-PlayerNameLabel.Position = UDim2.new(0, 70, 0, 28)
-PlayerNameLabel.BackgroundTransparency = 1
-PlayerNameLabel.Text = "Player: " .. LocalPlayer.Name
-PlayerNameLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-PlayerNameLabel.TextSize = 12
-PlayerNameLabel.Font = Enum.Font.GothamBold
-PlayerNameLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local UserIdLabel = Instance.new("TextLabel", ProfileFrame)
-UserIdLabel.Size = UDim2.new(1, -75, 0, 16)
-UserIdLabel.Position = UDim2.new(0, 70, 0, 46)
-UserIdLabel.BackgroundTransparency = 1
-UserIdLabel.Text = "ID: " .. LocalPlayer.UserId
-UserIdLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
-UserIdLabel.TextSize = 11
-UserIdLabel.Font = Enum.Font.GothamMedium
-UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local ProfileHideBtn = Instance.new("TextButton", ProfileFrame)
-ProfileHideBtn.Text = "-"
-ProfileHideBtn.Size = UDim2.new(0, 22, 0, 22)
-ProfileHideBtn.Position = UDim2.new(1, -26, 0.02, 0)
-ProfileHideBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ProfileHideBtn.TextColor3 = Color3.new(1, 1, 1)
-ProfileHideBtn.Font = Enum.Font.GothamBold
-Instance.new("UICorner", ProfileHideBtn).CornerRadius = UDim.new(0, 4)
-
-local SaveProfileBtn = Instance.new("TextButton", ProfileFrame)
-SaveProfileBtn.Text = "💾"
-SaveProfileBtn.Size = UDim2.new(0, 22, 0, 22)
-SaveProfileBtn.Position = UDim2.new(1, -52, 0.02, 0)
-SaveProfileBtn.BackgroundColor3 = Color3.fromRGB(30, 80, 30)
-SaveProfileBtn.TextColor3 = Color3.new(1, 1, 1)
-SaveProfileBtn.Font = Enum.Font.GothamBold
-Instance.new("UICorner", SaveProfileBtn).CornerRadius = UDim.new(0, 4)
-
-ProfileFloatBtn = Instance.new("ImageButton", ScreenGui)
-ProfileFloatBtn.Size = UDim2.new(0, 40, 0, 40)
-ProfileFloatBtn.Position = UDim2.new(0.9, 0, 0.5, -20)
-ProfileFloatBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-ProfileFloatBtn.BackgroundTransparency = 0.3
-ProfileFloatBtn.Image = "rbxassetid://88285387138547"
-ProfileFloatBtn.Visible = false
-Instance.new("UICorner", ProfileFloatBtn).CornerRadius = UDim.new(1, 0)
-MakeDraggable(ProfileFloatBtn)
-
-local ProfileFloatStroke = Instance.new("UIStroke", ProfileFloatBtn)
-ProfileFloatStroke.Thickness = 2
-
-task.spawn(function()
-    while ScriptRunning do
-        for i = 0, 1, 0.05 do
-            if not ScriptRunning then break end
-            ProfileFloatStroke.Color = Color3.fromHSV(i, 1, 1)
-            task.wait(0.1)
-        end
-    end
-end)
-
-ProfileHideBtn.MouseButton1Click:Connect(function()
-    ProfileFrame.Visible = false
-    ProfileFloatBtn.Visible = true
-    if UITimer then UITimer:Disconnect(); UITimer = nil end
-end)
-
-ProfileFloatBtn.MouseButton1Click:Connect(ShowUI)
-
-SaveProfileBtn.MouseButton1Click:Connect(function()
-    local info = string.format("Tên: %s\nID: %d\nCustom: owr: Nguyen / Builder : Nam", LocalPlayer.Name, LocalPlayer.UserId)
-    pcall(function()
-        if setclipboard then
-            setclipboard(info)
-            SaveProfileBtn.Text = "✓"
-            task.wait(2)
-            SaveProfileBtn.Text = "💾"
-        end
-    end)
-end)
-
+-- Event Handlers
 CloseBtn.MouseButton1Click:Connect(CleanupAll)
 
 MainFrame.MouseEnter:Connect(function()
@@ -553,7 +433,6 @@ MainFrame.MouseEnter:Connect(function()
     end
 end)
 
--- Event Handlers
 SpeedInput.FocusLost:Connect(function()
     local v = tonumber(SpeedInput.Text)
     if v then Config.WalkSpeed = v else SpeedInput.Text = tostring(Config.WalkSpeed) end
@@ -885,7 +764,6 @@ task.spawn(function()
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if not root then return end
                 local rootPos = root.Position
-
                 for _, obj in pairs(Workspace:GetDescendants()) do
                     if not ScriptRunning or not Features.ESPItem then break end
                     if obj:IsA("BasePart") and LootNames[obj.Name] then
@@ -896,7 +774,6 @@ task.spawn(function()
                         hl.FillColor = Color3.fromRGB(255, 255, 0)
                         hl.OutlineColor = Color3.fromRGB(255, 255, 255)
                         hl.Enabled = true
-
                         local bgui = obj:FindFirstChild("ESPTextGui")
                         if not bgui then
                             bgui = Instance.new("BillboardGui", obj)
@@ -904,7 +781,6 @@ task.spawn(function()
                             bgui.Size = UDim2.new(0, 100, 0, 30)
                             bgui.AlwaysOnTop = true
                             bgui.StudsOffset = Vector3.new(0, 2, 0)
-
                             local lbl = Instance.new("TextLabel", bgui)
                             lbl.Name = "TextLabel"
                             lbl.Size = UDim2.new(1, 0, 1, 0)
@@ -944,7 +820,6 @@ task.spawn(function()
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if not root then return end
                 local rootPos = root.Position
-
                 for _, model in pairs(Workspace:GetChildren()) do
                     if not ScriptRunning or not Features.ESPNPC then break end
                     if model:IsA("Model") and model ~= char then
@@ -953,13 +828,11 @@ task.spawn(function()
                             local npcRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
                             if npcRoot then
                                 local dist = math.floor((rootPos - npcRoot.Position).Magnitude)
-
                                 local hl = model:FindFirstChild("NPCHighlight") or Instance.new("Highlight", model)
                                 hl.Name = "NPCHighlight"
                                 hl.FillColor = Color3.fromRGB(255, 0, 0)
                                 hl.OutlineColor = Color3.fromRGB(255, 255, 255)
                                 hl.Enabled = true
-
                                 local bgui = npcRoot:FindFirstChild("NPCTextGui")
                                 if not bgui then
                                     bgui = Instance.new("BillboardGui", npcRoot)
@@ -967,7 +840,6 @@ task.spawn(function()
                                     bgui.Size = UDim2.new(0, 120, 0, 30)
                                     bgui.AlwaysOnTop = true
                                     bgui.StudsOffset = Vector3.new(0, 3, 0)
-
                                     local lbl = Instance.new("TextLabel", bgui)
                                     lbl.Name = "TextLabel"
                                     lbl.Size = UDim2.new(1, 0, 1, 0)
@@ -976,7 +848,6 @@ task.spawn(function()
                                     lbl.Font = Enum.Font.GothamBold
                                     lbl.TextSize = 11
                                 end
-
                                 if bgui:FindFirstChild("TextLabel") then
                                     bgui.TextLabel.Text = string.format("%s [%d HP] [%dm]", model.Name, math.floor(hum.Health), dist)
                                 end
@@ -992,4 +863,4 @@ end)
 
 -- Khởi động UI
 ShowUI()
-print("Strawberry Hub v2.0 - Đã tải thành công!")
+print("Strawberry Hub v1.0 - Đã tải thành công!")
