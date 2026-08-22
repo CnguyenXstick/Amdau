@@ -13,6 +13,7 @@ local LocalPlayer = Players.LocalPlayer
 
 -- ===== BIẾN TOÀN CỤC =====
 local ScriptRunning = true
+local UITimer = nil -- Timer tự động ẩn
 
 -- Trạng thái tính năng
 local Features = {
@@ -98,6 +99,38 @@ local function TeleportTo(x, y, z)
     if char and char:FindFirstChild("HumanoidRootPart") then
         char.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
     end
+end
+
+-- Hàm tự động ẩn UI sau 5 giây
+local function AutoHideUI()
+    if UITimer then 
+        UITimer:Disconnect() 
+        UITimer = nil 
+    end
+    
+    UITimer = task.delay(5, function()
+        if ScriptRunning then
+            MainFrame.Visible = false
+            ProfileFrame.Visible = false
+            FloatBtn.Visible = true
+            ProfileFloatBtn.Visible = true
+        end
+    end)
+end
+
+-- Hàm hiển thị UI và reset timer
+local function ShowUI()
+    MainFrame.Visible = true
+    ProfileFrame.Visible = true
+    FloatBtn.Visible = false
+    ProfileFloatBtn.Visible = false
+    
+    -- Reset timer tự động ẩn
+    if UITimer then 
+        UITimer:Disconnect() 
+        UITimer = nil 
+    end
+    AutoHideUI()
 end
 
 -- ===== HÀM TẠO UI =====
@@ -200,7 +233,7 @@ ScreenGui.Name = "StrawberryHubGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = CoreGui
 
--- Frame chính
+-- Frame chính - Đặt giữa màn hình
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 450, 0, 270)
@@ -234,7 +267,7 @@ Title.TextSize = 12
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Nút ẩn
+-- Nút ẩn (dùng để ẩn thủ công)
 local HideBtn = Instance.new("TextButton", MainFrame)
 HideBtn.Text = "-"
 HideBtn.Size = UDim2.new(0, 22, 0, 22)
@@ -254,11 +287,11 @@ CloseBtn.TextColor3 = Color3.new(1, 1, 1)
 CloseBtn.Font = Enum.Font.GothamBold
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
--- Nút mở (khi ẩn)
+-- Nút mở (khi ẩn) - Đặt ở giữa bên trái
 local FloatBtn = Instance.new("ImageButton", ScreenGui)
 FloatBtn.Name = "OpenButton"
 FloatBtn.Size = UDim2.new(0, 45, 0, 45)
-FloatBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+FloatBtn.Position = UDim2.new(0.02, 0, 0.5, -22.5)
 FloatBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 FloatBtn.BackgroundTransparency = 0.3
 FloatBtn.Image = "rbxassetid://88285387138547"
@@ -279,14 +312,20 @@ task.spawn(function()
     end
 end)
 
--- Ẩn/hiện
+-- Ẩn/hiện (hiển thị lại khi bấm nút mở)
 HideBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
+    ProfileFrame.Visible = false
     FloatBtn.Visible = true
+    ProfileFloatBtn.Visible = true
+    if UITimer then 
+        UITimer:Disconnect() 
+        UITimer = nil 
+    end
 end)
+
 FloatBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    FloatBtn.Visible = false
+    ShowUI()
 end)
 
 -- Sidebar
@@ -433,10 +472,11 @@ Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
 local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.42, TPContainer, 1, 0)
 
 -- ===== BẢNG THÔNG TIN CUSTOM (PROFILE) =====
+-- Đặt Profile ở giữa dưới MainFrame
 local ProfileFrame = Instance.new("Frame", ScreenGui)
 ProfileFrame.Name = "ProfileFrame"
 ProfileFrame.Size = UDim2.new(0, 240, 0, 75)
-ProfileFrame.Position = UDim2.new(0.5, -225, 0.5, 145)
+ProfileFrame.Position = UDim2.new(0.5, -120, 0.5, 150)
 ProfileFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 ProfileFrame.BackgroundTransparency = 0.3
 Instance.new("UICorner", ProfileFrame).CornerRadius = UDim.new(0, 8)
@@ -530,11 +570,11 @@ SaveProfileBtn.TextColor3 = Color3.new(1, 1, 1)
 SaveProfileBtn.Font = Enum.Font.GothamBold
 Instance.new("UICorner", SaveProfileBtn).CornerRadius = UDim.new(0, 4)
 
--- Nút mở Profile (khi ẩn)
+-- Nút mở Profile (khi ẩn) - Đặt ở góc phải
 local ProfileFloatBtn = Instance.new("ImageButton", ScreenGui)
 ProfileFloatBtn.Name = "ProfileOpenBtn"
 ProfileFloatBtn.Size = UDim2.new(0, 40, 0, 40)
-ProfileFloatBtn.Position = UDim2.new(0.75, 0, 0.1, 0)
+ProfileFloatBtn.Position = UDim2.new(0.9, 0, 0.5, -20)
 ProfileFloatBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 ProfileFloatBtn.BackgroundTransparency = 0.3
 ProfileFloatBtn.Image = "rbxassetid://88285387138547"
@@ -558,11 +598,14 @@ end)
 ProfileHideBtn.MouseButton1Click:Connect(function()
     ProfileFrame.Visible = false
     ProfileFloatBtn.Visible = true
+    if UITimer then 
+        UITimer:Disconnect() 
+        UITimer = nil 
+    end
 end)
 
 ProfileFloatBtn.MouseButton1Click:Connect(function()
-    ProfileFrame.Visible = true
-    ProfileFloatBtn.Visible = false
+    ShowUI()
 end)
 
 -- Lưu thông tin Profile
@@ -598,6 +641,28 @@ end)
 -- ===== XỬ LÝ SỰ KIỆN =====
 
 CloseBtn.MouseButton1Click:Connect(CleanupAll)
+
+-- Bất kỳ thao tác nào trên UI cũng reset timer
+local function ResetTimerOnAction()
+    if MainFrame.Visible then
+        if UITimer then 
+            UITimer:Disconnect() 
+            UITimer = nil 
+        end
+        AutoHideUI()
+    end
+end
+
+-- Bắt sự kiện khi bấm vào bất kỳ nút nào trong MainFrame
+MainFrame.MouseEnter:Connect(function()
+    if MainFrame.Visible then
+        if UITimer then 
+            UITimer:Disconnect() 
+            UITimer = nil 
+        end
+        AutoHideUI()
+    end
+end)
 
 -- Cập nhật cấu hình từ TextBox
 SpeedInput.FocusLost:Connect(function()
@@ -662,7 +727,6 @@ NoFuelBtn.MouseButton1Click:Connect(function()
     Features.NoFuel = not Features.NoFuel
     NoFuelBtn.Text = "Băng Nhiên Liệu: " .. (Features.NoFuel and "BẬT" or "TẮT")
     
-    -- Setup hook khi bật
     if Features.NoFuel then
         pcall(function()
             local rawmeta = getrawmetatable(game)
@@ -1170,5 +1234,9 @@ task.spawn(function()
         task.wait(0.5)
     end
 end)
+
+-- ===== HIỂN THỊ UI LẦN ĐẦU =====
+-- Hiện UI ngay khi script chạy
+ShowUI()
 
 print("Strawberry Hub đã tải thành công!")
