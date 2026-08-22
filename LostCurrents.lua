@@ -14,6 +14,19 @@ local tpwalking = false
 local defaultAmbient = Lighting.Ambient
 local defaultOutdoor = Lighting.OutdoorAmbient
 
+-- Danh sách tên vật phẩm ĐƯỢC PHÉP Auto Lụm (Tránh nhầm nút Kéo/Chèo thuyền)
+local LootNames = {
+    ["Scrap"] = true,
+    ["Gold"] = true,
+    ["Chest"] = true,
+    ["La bàn"] = true,
+    ["Compass"] = true,
+    ["Coin"] = true,
+    ["Loot"] = true,
+    ["Item"] = true,
+    ["Treasure"] = true
+}
+
 -- Hàm Kéo Thả
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
@@ -194,11 +207,9 @@ local function CleanupAll()
     brightOn = false
     tpwalking = false
 
-    -- Reset Lighting
     Lighting.Ambient = defaultAmbient
     Lighting.OutdoorAmbient = defaultOutdoor
 
-    -- Reset Nhân vật
     local char = LocalPlayer.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
@@ -214,13 +225,11 @@ local function CleanupAll()
         end
     end
 
-    -- Xóa sạch ESP UI trong Workspace
     for _, obj in pairs(Workspace:GetDescendants()) do
         if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight:Destroy() end
         if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui:Destroy() end
     end
 
-    -- Xóa UI
     ScreenGui:Destroy()
 end
 
@@ -315,7 +324,7 @@ BrightBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- NOCLIP (Tối ưu chỉ chạy khi Bật)
+-- NOCLIP
 RunService.Stepped:Connect(function()
     if noclipOn and scriptRunning then
         local char = LocalPlayer.Character
@@ -327,7 +336,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- ESP + AUTO LỤM (Tối ưu quét để giảm Lag)
+-- ESP + AUTO LỤM (Đã lọc chính xác vật phẩm Loot)
 task.spawn(function()
     while scriptRunning do
         if espOn or collectOn then
@@ -339,7 +348,7 @@ task.spawn(function()
                 for _, obj in pairs(Workspace:GetDescendants()) do
                     if not scriptRunning then break end
                     if obj:IsA("BasePart") then
-                        local isTarget = (obj.Name == "La bàn" or obj.Name == "Scrap" or obj.Name == "Gold" or obj.Name == "Chest")
+                        local isTarget = LootNames[obj.Name] ~= nil
                         local dist = (rootPos - obj.Position).Magnitude
                         
                         -- ESP
@@ -376,16 +385,13 @@ task.spawn(function()
                             bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
                         end
                         
-                        -- Auto Lụm
-                        if collectOn then
+                        -- Auto Lụm (Chỉ kích hoạt trên vật phẩm Loot)
+                        if collectOn and isTarget and dist <= 15 then
                             local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
                             if prompt then
-                                local parentPart = prompt.Parent:IsA("BasePart") and prompt.Parent or obj
-                                if (rootPos - parentPart.Position).Magnitude <= 15 then
-                                    prompt.HoldDuration = 0
-                                    fireproximityprompt(prompt)
-                                end
-                            elseif isTarget and dist <= 15 then
+                                prompt.HoldDuration = 0
+                                fireproximityprompt(prompt)
+                            else
                                 obj.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 1, 0)
                             end
                         end
@@ -393,7 +399,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.2) -- Tăng thời gian chờ lên 0.2s để giảm tải cho CPU
+        task.wait(0.2)
     end
 end)
 
