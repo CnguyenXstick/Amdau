@@ -5,15 +5,23 @@ local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 
--- Biến quản lý trạng thái
+-- Trạng thái tổng
 local scriptRunning = true
 local flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
 
--- Lưu trạng thái Lighting ban đầu
+-- Trạng thái & Giá trị cấu hình bổ sung (Misc)
+local speedOn = false
+local speedValue = 32
+
+local jumpOn = false
+local jumpValue = 100
+
+local boatSpeedOn = false
+local boatSpeedValue = 150
+
 local defaultAmbient = Lighting.Ambient
 local defaultOutdoor = Lighting.OutdoorAmbient
 
--- Danh sách vật phẩm Auto Lụm & ESP
 local LootNames = {
     ["Scrap"] = true, ["Gold"] = true, ["Chest"] = true, ["La bàn"] = true,
     ["Compass"] = true, ["Coin"] = true, ["Loot"] = true, ["Item"] = true, ["Treasure"] = true,
@@ -24,11 +32,6 @@ local LootNames = {
 -- Hàm Kéo Thả UI
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
-    local function update(input)
-        local delta = input.Position - dragStart
-        gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-
     gui.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -39,23 +42,28 @@ local function MakeDraggable(gui)
             end)
         end
     end)
-
     gui.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then update(input) end
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
     end)
 end
 
--- UI Setup (Hình chữ nhật nằm ngang)
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+-- UI Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "StrawberryHubGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Name = "StrawberryHub"
-MainFrame.Size = UDim2.new(0, 450, 0, 260) -- Chuyển sang kích thước chữ nhật ngang
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 450, 0, 260)
 MainFrame.Position = UDim2.new(0.5, -225, 0.5, -130)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BackgroundTransparency = 0.3
@@ -64,6 +72,7 @@ MakeDraggable(MainFrame)
 
 local UIStroke = Instance.new("UIStroke", MainFrame)
 UIStroke.Thickness = 2
+
 task.spawn(function()
     while scriptRunning do
         for i = 0, 1, 0.05 do 
@@ -126,53 +135,41 @@ end)
 HideBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; FloatBtn.Visible = true end)
 FloatBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatBtn.Visible = false end)
 
--- Thanh Sidebar bên trái chứa các nút chọn Tab
+-- Sidebar Tabs
 local Sidebar = Instance.new("Frame", MainFrame)
 Sidebar.Size = UDim2.new(0, 100, 1, -35)
 Sidebar.Position = UDim2.new(0, 8, 0, 30)
 Sidebar.BackgroundTransparency = 1
 
-local TabMainBtn = Instance.new("TextButton", Sidebar)
-TabMainBtn.Text = "Main"
-TabMainBtn.Size = UDim2.new(1, 0, 0, 28)
-TabMainBtn.Position = UDim2.new(0, 0, 0, 0)
+local function CreateTabButton(text, y)
+    local b = Instance.new("TextButton", Sidebar)
+    b.Text = text
+    b.Size = UDim2.new(1, 0, 0, 28)
+    b.Position = UDim2.new(0, 0, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    b.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
+    return b
+end
+
+local TabMainBtn = CreateTabButton("Main", 0)
+local TabMiscBtn = CreateTabButton("Misc", 34)
+local TabTPBtn = CreateTabButton("TP", 68)
+
 TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", TabMainBtn).CornerRadius = UDim.new(0, 4)
 
-local TabMiscBtn = Instance.new("TextButton", Sidebar)
-TabMiscBtn.Text = "Misc"
-TabMiscBtn.Size = UDim2.new(1, 0, 0, 28)
-TabMiscBtn.Position = UDim2.new(0, 0, 0, 34)
-TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-Instance.new("UICorner", TabMiscBtn).CornerRadius = UDim.new(0, 4)
+local function CreateContainer()
+    local c = Instance.new("Frame", MainFrame)
+    c.Size = UDim2.new(1, -124, 1, -38)
+    c.Position = UDim2.new(0, 116, 0, 30)
+    c.BackgroundTransparency = 1
+    return c
+end
 
-local TabTPBtn = Instance.new("TextButton", Sidebar)
-TabTPBtn.Text = "TP"
-TabTPBtn.Size = UDim2.new(1, 0, 0, 28)
-TabTPBtn.Position = UDim2.new(0, 0, 0, 68)
-TabTPBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-TabTPBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-Instance.new("UICorner", TabTPBtn).CornerRadius = UDim.new(0, 4)
-
--- Container Các Tab nằm bên phải
-local MainContainer = Instance.new("Frame", MainFrame)
-MainContainer.Size = UDim2.new(1, -124, 1, -38)
-MainContainer.Position = UDim2.new(0, 116, 0, 30)
-MainContainer.BackgroundTransparency = 1
-
-local MiscContainer = Instance.new("Frame", MainFrame)
-MiscContainer.Size = UDim2.new(1, -124, 1, -38)
-MiscContainer.Position = UDim2.new(0, 116, 0, 30)
-MiscContainer.BackgroundTransparency = 1
-MiscContainer.Visible = false
-
-local TPContainer = Instance.new("Frame", MainFrame)
-TPContainer.Size = UDim2.new(1, -124, 1, -38)
-TPContainer.Position = UDim2.new(0, 116, 0, 30)
-TPContainer.BackgroundTransparency = 1
-TPContainer.Visible = false
+local MainContainer = CreateContainer()
+local MiscContainer = CreateContainer(); MiscContainer.Visible = false
+local TPContainer = CreateContainer(); TPContainer.Visible = false
 
 local function SetTab(activeBtn, activeContainer)
     MainContainer.Visible = false; MiscContainer.Visible = false; TPContainer.Visible = false
@@ -228,10 +225,38 @@ local ESPNpcBtn = CreateButton("ESP NPC (Đỏ): OFF", 0.48, MainContainer, 1, 0
 
 -- TAB MISC
 local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer, 1, 0)
-local NoclipBtn = CreateButton("Noclip: OFF", 0.16, MiscContainer, 1, 0)
-local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.32, MiscContainer, 1, 0)
+local NoclipBtn = CreateButton("Noclip: OFF", 0.14, MiscContainer, 1, 0)
+local FixLagBtn = CreateButton("Fix Lag (Boost FPS)", 0.28, MiscContainer, 1, 0)
 
--- TAB TELEPORT (TP)
+local SpeedBtn = CreateButton("WalkSpeed ("..speedValue.."): OFF", 0.42, MiscContainer, 1, 0)
+local JumpBtn = CreateButton("JumpPower ("..jumpValue.."): OFF", 0.56, MiscContainer, 1, 0)
+local BoatSpeedBtn = CreateButton("Boat Speed ("..boatSpeedValue.."): OFF", 0.70, MiscContainer, 1, 0)
+
+SpeedBtn.MouseButton1Click:Connect(function() 
+    speedOn = not speedOn 
+    SpeedBtn.Text = "WalkSpeed ("..speedValue.."): "..(speedOn and "ON" or "OFF") 
+     
+    if not speedOn and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then 
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16 
+    end 
+end) 
+
+JumpBtn.MouseButton1Click:Connect(function() 
+    jumpOn = not jumpOn 
+    JumpBtn.Text = "JumpPower ("..jumpValue.."): "..(jumpOn and "ON" or "OFF") 
+     
+    if not jumpOn and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then 
+        LocalPlayer.Character.Humanoid.UseJumpPower = true 
+        LocalPlayer.Character.Humanoid.JumpPower = 50 
+    end 
+end) 
+
+BoatSpeedBtn.MouseButton1Click:Connect(function() 
+    boatSpeedOn = not boatSpeedOn 
+    BoatSpeedBtn.Text = "Boat Speed ("..boatSpeedValue.."): "..(boatSpeedOn and "ON" or "OFF") 
+end)
+
+-- TAB TELEPORT
 local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0, TPContainer, 1, 0)
 local PirateBaseBtn = CreateButton("Base hải tặc", 0.16, TPContainer, 1, 0)
 
@@ -245,7 +270,6 @@ Instance.new("UICorner", CustomTPInput).CornerRadius = UDim.new(0, 4)
 
 local CustomTPBtn = CreateButton("TP Tọa Độ Đã Nhập", 0.48, TPContainer, 1, 0)
 
--- Logic TP
 local function TeleportTo(x, y, z)
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -305,6 +329,16 @@ UserInputService.InputEnded:Connect(function(input)
     elseif input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.LeftControl then downPressed = false end
 end)
 
+local function StopFly()
+    if flyBG then flyBG:Destroy(); flyBG = nil end
+    if flyBV then flyBV:Destroy(); flyBV = nil end
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = false end
+    end
+end
+
 FlyBtn.MouseButton1Click:Connect(function()
     flyOn = not flyOn
     FlyBtn.Text = "Fly: "..(flyOn and "ON" or "OFF")
@@ -328,9 +362,7 @@ FlyBtn.MouseButton1Click:Connect(function()
             hum.PlatformStand = true
         end
     else
-        if flyBG then flyBG:Destroy() end
-        if flyBV then flyBV:Destroy() end
-        if hum then hum.PlatformStand = false end
+        StopFly()
     end
 end)
 
@@ -382,7 +414,7 @@ task.spawn(function()
                 local equippedTool = char:FindFirstChildOfClass("Tool")
 
                 if equippedTool then
-                    for _, model in pairs(Workspace:GetDescendants()) do
+                    for _, model in pairs(Workspace:GetChildren()) do
                         if model:IsA("Model") and model ~= char and model:FindFirstChildOfClass("Humanoid") then
                             local hum = model:FindFirstChildOfClass("Humanoid")
                             if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(model) then
@@ -404,7 +436,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.1)
+        task.wait(0.15)
     end
 end)
 
@@ -420,26 +452,29 @@ RunService.Stepped:Connect(function()
     end
 end)
 
+-- HÀM DỌN DẸP ESP
+local function ClearESP(tag)
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        local target = obj:FindFirstChild(tag)
+        if target then target:Destroy() end
+    end
+end
+
 -- CLEANUP KHI TẮT GUI
 local function CleanupAll()
     scriptRunning = false
-    flyOn = false; collectOn = false; espOn = false; espNpcOn = false; killAuraOn = false; noclipOn = false; brightOn = false
+    flyOn, collectOn, espOn, espNpcOn, killAuraOn, noclipOn, brightOn = false, false, false, false, false, false, false
+    speedOn, jumpOn, boatSpeedOn = false, false, false
 
-    if flyBG then flyBG:Destroy() end
-    if flyBV then flyBV:Destroy() end
+    StopFly()
 
     Lighting.Ambient = defaultAmbient
     Lighting.OutdoorAmbient = defaultOutdoor
 
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChildOfClass("Humanoid") then char.Humanoid.PlatformStand = false end
-
-    for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight:Destroy() end
-        if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui:Destroy() end
-        if obj:FindFirstChild("NPCHighlight") then obj.NPCHighlight:Destroy() end
-        if obj:FindFirstChild("NPCTextGui") then obj.NPCTextGui:Destroy() end
-    end
+    ClearESP("ESPHighlight")
+    ClearESP("ESPTextGui")
+    ClearESP("NPCHighlight")
+    ClearESP("NPCTextGui")
 
     ScreenGui:Destroy()
 end
@@ -453,10 +488,8 @@ ESPBtn.MouseButton1Click:Connect(function()
     espOn = not espOn
     ESPBtn.Text = "ESP Item: "..(espOn and "ON" or "OFF")
     if not espOn then
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight.Enabled = false end
-            if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui.Enabled = false end
-        end
+        ClearESP("ESPHighlight")
+        ClearESP("ESPTextGui")
     end
 end)
 
@@ -464,10 +497,8 @@ ESPNpcBtn.MouseButton1Click:Connect(function()
     espNpcOn = not espNpcOn
     ESPNpcBtn.Text = "ESP NPC (Đỏ): "..(espNpcOn and "ON" or "OFF")
     if not espNpcOn then
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:FindFirstChild("NPCHighlight") then obj.NPCHighlight.Enabled = false end
-            if obj:FindFirstChild("NPCTextGui") then obj.NPCTextGui.Enabled = false end
-        end
+        ClearESP("NPCHighlight")
+        ClearESP("NPCTextGui")
     end
 end)
 
@@ -492,11 +523,10 @@ task.spawn(function()
                 
                 for _, obj in pairs(Workspace:GetDescendants()) do
                     if not scriptRunning then break end
-                    if obj:IsA("BasePart") then
-                        local isTarget = LootNames[obj.Name] ~= nil
+                    if obj:IsA("BasePart") and LootNames[obj.Name] then
                         local dist = (rootPos - obj.Position).Magnitude
                         
-                        if isTarget and espOn then
+                        if espOn then
                             local hl = obj:FindFirstChild("ESPHighlight") or Instance.new("Highlight", obj)
                             hl.Name = "ESPHighlight"
                             hl.FillColor = Color3.fromRGB(255, 255, 0)
@@ -524,7 +554,7 @@ task.spawn(function()
                             bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
                         end
                         
-                        if collectOn and isTarget and dist <= 15 then
+                        if collectOn and dist <= 15 then
                             local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
                             if prompt then
                                 prompt.HoldDuration = 0
@@ -537,7 +567,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.3)
+        task.wait(0.5)
     end
 end)
 
@@ -550,7 +580,7 @@ task.spawn(function()
                 if not char or not char:FindFirstChild("HumanoidRootPart") then return end
                 local rootPos = char.HumanoidRootPart.Position
 
-                for _, model in pairs(Workspace:GetDescendants()) do
+                for _, model in pairs(Workspace:GetChildren()) do
                     if not scriptRunning then break end
                     if model:IsA("Model") and model ~= char and model:FindFirstChildOfClass("Humanoid") then
                         if not Players:GetPlayerFromCharacter(model) then
@@ -590,7 +620,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.4)
+        task.wait(0.5)
     end
 end)
 
@@ -628,4 +658,49 @@ task.spawn(function()
         end)
         task.wait(0.5)
     end
+end)
+
+-- VÒNG LẶP XỬ LÝ ĐƯỢC THÊM VÀO
+-- Loop 1: Xử lý Tốc độ thuyền (Boat Speed)
+task.spawn(function() 
+    while scriptRunning do 
+        if boatSpeedOn then 
+            pcall(function() 
+                local char = LocalPlayer.Character 
+                if char and char:FindFirstChild("Humanoid") then 
+                    local seat = char.Humanoid.SeatPart 
+                    if seat and seat:IsA("VehicleSeat") then 
+                        seat.MaxSpeed = boatSpeedValue 
+                         
+                        if seat.Throttle ~= 0 then 
+                            local currentY = seat.AssemblyLinearVelocity.Y 
+                            local targetVelocity = seat.CFrame.LookVector * (seat.Throttle * boatSpeedValue) 
+                             
+                            seat.AssemblyLinearVelocity = Vector3.new(targetVelocity.X, currentY, targetVelocity.Z) 
+                        end 
+                    end 
+                end 
+            end) 
+        end 
+        task.wait(0.02) 
+    end 
+end) 
+
+-- Loop 2: Xử lý WalkSpeed / JumpPower nhân vật
+task.spawn(function() 
+    while scriptRunning do 
+        pcall(function() 
+            local char = LocalPlayer.Character 
+            if char and char:FindFirstChild("Humanoid") then 
+                if speedOn then 
+                    char.Humanoid.WalkSpeed = speedValue 
+                end 
+                if jumpOn then 
+                    char.Humanoid.UseJumpPower = true 
+                    char.Humanoid.JumpPower = jumpValue 
+                end 
+            end 
+        end) 
+        task.wait(0.1) 
+    end 
 end)
