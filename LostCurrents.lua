@@ -100,29 +100,6 @@ local function TeleportTo(x, y, z)
     end
 end
 
--- Hook chặn RemoteEvent (No-Fuel)
-local function SetupNoFuelHook()
-    pcall(function()
-        local rawmeta = getrawmetatable(game)
-        local oldNamecall = rawmeta.__namecall
-        setreadonly(rawmeta, false)
-        
-        rawmeta.__namecall = newcclosure(function(self, ...)
-            local method = getnamecallmethod()
-            if method == "FireServer" and self and Features.NoFuel then
-                local name = string.lower(self.Name)
-                if name:find("fuel") or name:find("gas") or 
-                   name:find("consume") or name:find("xang") or 
-                   name:find("drain") or name:find("use") then
-                    return nil
-                end
-            end
-            return oldNamecall(self, ...)
-        end)
-        setreadonly(rawmeta, true)
-    end)
-end
-
 -- ===== HÀM TẠO UI =====
 
 -- Tạo GUI kéo thả
@@ -276,7 +253,6 @@ CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 CloseBtn.TextColor3 = Color3.new(1, 1, 1)
 CloseBtn.Font = Enum.Font.GothamBold
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
-CloseBtn.MouseButton1Click:Connect(CleanupAll)
 
 -- Nút mở (khi ẩn)
 local FloatBtn = Instance.new("ImageButton", ScreenGui)
@@ -482,7 +458,7 @@ task.spawn(function()
     end
 end)
 
--- Khung Ảnh (Sử dụng ID Custom)
+-- Khung Ảnh
 local CustomImg = Instance.new("ImageLabel", ProfileFrame)
 CustomImg.Name = "CustomImage"
 CustomImg.Size = UDim2.new(0, 55, 0, 55)
@@ -510,7 +486,7 @@ CustomNameLabel.Font = Enum.Font.GothamBold
 CustomNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 CustomNameLabel.TextWrapped = true
 
--- Tên người chơi thực tế
+-- Tên người chơi
 local PlayerNameLabel = Instance.new("TextLabel", ProfileFrame)
 PlayerNameLabel.Name = "PlayerNameLabel"
 PlayerNameLabel.Size = UDim2.new(1, -75, 0, 16)
@@ -608,7 +584,7 @@ SaveProfileBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Cập nhật thông tin người chơi theo thời gian thực
+-- Cập nhật thông tin người chơi
 task.spawn(function()
     while ScriptRunning do
         pcall(function()
@@ -620,6 +596,8 @@ task.spawn(function()
 end)
 
 -- ===== XỬ LÝ SỰ KIỆN =====
+
+CloseBtn.MouseButton1Click:Connect(CleanupAll)
 
 -- Cập nhật cấu hình từ TextBox
 SpeedInput.FocusLost:Connect(function()
@@ -635,6 +613,77 @@ end)
 BoatInput.FocusLost:Connect(function()
     local v = tonumber(BoatInput.Text)
     if v then Config.BoatSpeed = v else BoatInput.Text = tostring(Config.BoatSpeed) end
+end)
+
+-- Xử lý nút Teleport
+SpecificTPBtn.MouseButton1Click:Connect(function() TeleportTo(1230, 220, 60) end)
+PirateBaseBtn.MouseButton1Click:Connect(function() TeleportTo(-2500, 250, -1500) end)
+
+CustomTPBtn.MouseButton1Click:Connect(function()
+    local text = CustomTPInput.Text
+    local coords = {}
+    for num in string.gmatch(text, "[-?%d%.]+") do 
+        table.insert(coords, tonumber(num)) 
+    end
+    if #coords >= 3 then 
+        TeleportTo(coords[1], coords[2], coords[3]) 
+    end
+end)
+
+-- Xử lý nút Fix Lag
+FixLagBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 0
+        for _, v in pairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("BloomEffect") then
+                v.Enabled = false
+            end
+        end
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsA("MeshPart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.Reflectance = 0
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj:Destroy()
+            elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+                obj.Enabled = false
+            end
+        end
+    end)
+    FixLagBtn.Text = "Đã Fix Lag!"
+    task.wait(1.5)
+    FixLagBtn.Text = "Fix Lag (Boost FPS)"
+end)
+
+-- Xử lý nút No-Fuel
+NoFuelBtn.MouseButton1Click:Connect(function()
+    Features.NoFuel = not Features.NoFuel
+    NoFuelBtn.Text = "Băng Nhiên Liệu: " .. (Features.NoFuel and "BẬT" or "TẮT")
+    
+    -- Setup hook khi bật
+    if Features.NoFuel then
+        pcall(function()
+            local rawmeta = getrawmetatable(game)
+            local oldNamecall = rawmeta.__namecall
+            setreadonly(rawmeta, false)
+            
+            rawmeta.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if method == "FireServer" and self and Features.NoFuel then
+                    local name = string.lower(self.Name)
+                    if name:find("fuel") or name:find("gas") or 
+                       name:find("consume") or name:find("xang") or 
+                       name:find("drain") or name:find("use") then
+                        return nil
+                    end
+                end
+                return oldNamecall(self, ...)
+            end)
+            setreadonly(rawmeta, true)
+        end)
+    end
 end)
 
 -- ===== TÍNH NĂNG: FLY =====
@@ -852,4 +901,274 @@ task.spawn(function()
                 local rootPos = root.Position
                 
                 for _, obj in pairs(Workspace:GetDescendants()) do
-                    if not ScriptRunning or not Features.ESPItem then break
+                    if not ScriptRunning or not Features.ESPItem then break end
+                    
+                    if obj:IsA("BasePart") and LootNames[obj.Name] then
+                        local dist = (rootPos - obj.Position).Magnitude
+                        
+                        local hl = obj:FindFirstChild("ESPHighlight") or Instance.new("Highlight", obj)
+                        hl.Name = "ESPHighlight"
+                        hl.FillColor = Color3.fromRGB(255, 255, 0)
+                        hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        hl.Enabled = true
+                        
+                        local bgui = obj:FindFirstChild("ESPTextGui")
+                        if not bgui then
+                            bgui = Instance.new("BillboardGui", obj)
+                            bgui.Name = "ESPTextGui"
+                            bgui.Size = UDim2.new(0, 150, 0, 30)
+                            bgui.AlwaysOnTop = true
+                            bgui.ExtentsOffset = Vector3.new(0, 2, 0)
+                            
+                            local label = Instance.new("TextLabel", bgui)
+                            label.Name = "ESPLabel"
+                            label.Size = UDim2.new(1, 0, 1, 0)
+                            label.BackgroundTransparency = 1
+                            label.TextColor3 = Color3.fromRGB(255, 255, 0)
+                            label.TextStrokeTransparency = 0
+                            label.TextSize = 11
+                            label.Font = Enum.Font.GothamBold
+                        end
+                        bgui.Enabled = true
+                        bgui.ESPLabel.Text = obj.Name .. " [" .. math.floor(dist) .. "m]"
+                    end
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- ===== TÍNH NĂNG: ESP NPC =====
+
+ESPNpcBtn.MouseButton1Click:Connect(function()
+    Features.ESPNPC = not Features.ESPNPC
+    ESPNpcBtn.Text = "ESP NPC (Đỏ): " .. (Features.ESPNPC and "BẬT" or "TẮT")
+    if not Features.ESPNPC then
+        ClearESP("NPCHighlight")
+        ClearESP("NPCTextGui")
+    end
+end)
+
+task.spawn(function()
+    while ScriptRunning do
+        if Features.ESPNPC then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char then return end
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if not root then return end
+                
+                local rootPos = root.Position
+                
+                for _, model in pairs(Workspace:GetChildren()) do
+                    if not ScriptRunning then break end
+                    
+                    if model:IsA("Model") and model ~= char then
+                        local hum = model:FindFirstChildOfClass("Humanoid")
+                        if hum then
+                            if not Players:GetPlayerFromCharacter(model) then
+                                local npcRoot = model:FindFirstChild("HumanoidRootPart") or 
+                                               model:FindFirstChild("Head") or 
+                                               model.PrimaryPart
+                                if npcRoot then
+                                    local dist = (rootPos - npcRoot.Position).Magnitude
+                                    
+                                    local hl = model:FindFirstChild("NPCHighlight") or Instance.new("Highlight", model)
+                                    hl.Name = "NPCHighlight"
+                                    hl.FillColor = Color3.fromRGB(255, 0, 0)
+                                    hl.OutlineColor = Color3.fromRGB(150, 0, 0)
+                                    hl.FillTransparency = 0.4
+                                    hl.Enabled = true
+                                    
+                                    local bgui = npcRoot:FindFirstChild("NPCTextGui")
+                                    if not bgui then
+                                        bgui = Instance.new("BillboardGui", npcRoot)
+                                        bgui.Name = "NPCTextGui"
+                                        bgui.Size = UDim2.new(0, 150, 0, 30)
+                                        bgui.AlwaysOnTop = true
+                                        bgui.ExtentsOffset = Vector3.new(0, 2.5, 0)
+                                        
+                                        local label = Instance.new("TextLabel", bgui)
+                                        label.Name = "NPCLabel"
+                                        label.Size = UDim2.new(1, 0, 1, 0)
+                                        label.BackgroundTransparency = 1
+                                        label.TextColor3 = Color3.fromRGB(255, 50, 50)
+                                        label.TextStrokeTransparency = 0
+                                        label.TextSize = 12
+                                        label.Font = Enum.Font.GothamBold
+                                    end
+                                    bgui.Enabled = true
+                                    bgui.NPCLabel.Text = "[NPC] " .. model.Name .. " [" .. math.floor(dist) .. "m]"
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- ===== TÍNH NĂNG: NOCLIP =====
+
+NoclipBtn.MouseButton1Click:Connect(function()
+    Features.Noclip = not Features.Noclip
+    NoclipBtn.Text = "Noclip: " .. (Features.Noclip and "BẬT" or "TẮT")
+end)
+
+RunService.Stepped:Connect(function()
+    if Features.Noclip and ScriptRunning then
+        local char = LocalPlayer.Character
+        if char then
+            for _, child in pairs(char:GetDescendants()) do
+                if child:IsA("BasePart") then
+                    child.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- ===== TÍNH NĂNG: FULL BRIGHT =====
+
+BrightBtn.MouseButton1Click:Connect(function()
+    Features.Bright = not Features.Bright
+    BrightBtn.Text = "Full Bright: " .. (Features.Bright and "BẬT" or "TẮT")
+    
+    if Features.Bright then
+        Lighting.Ambient = Color3.new(1, 1, 1)
+        Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+    else
+        Lighting.Ambient = DefaultLighting.Ambient
+        Lighting.OutdoorAmbient = DefaultLighting.OutdoorAmbient
+    end
+end)
+
+-- ===== TÍNH NĂNG: WALKSPEED & JUMPPOWER =====
+
+SpeedBtn.MouseButton1Click:Connect(function()
+    Features.Speed = not Features.Speed
+    SpeedBtn.Text = "WalkSpeed: " .. (Features.Speed and "BẬT" or "TẮT")
+    if not Features.Speed then
+        local char = LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then hum.WalkSpeed = 16 end
+        end
+    end
+end)
+
+JumpBtn.MouseButton1Click:Connect(function()
+    Features.Jump = not Features.Jump
+    JumpBtn.Text = "JumpPower: " .. (Features.Jump and "BẬT" or "TẮT")
+    if not Features.Jump then
+        local char = LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.UseJumpPower = true
+                hum.JumpPower = 50
+            end
+        end
+    end
+end)
+
+-- Vòng lặp duy trì WalkSpeed & JumpPower
+task.spawn(function()
+    while ScriptRunning do
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    if Features.Speed then
+                        hum.WalkSpeed = Config.WalkSpeed
+                    end
+                    if Features.Jump then
+                        hum.UseJumpPower = true
+                        hum.JumpPower = Config.JumpPower
+                    end
+                end
+            end
+        end)
+        task.wait(0.2)
+    end
+end)
+
+-- ===== TÍNH NĂNG: BOAT SPEED =====
+
+BoatSpeedBtn.MouseButton1Click:Connect(function()
+    Features.BoatSpeed = not Features.BoatSpeed
+    BoatSpeedBtn.Text = "Boat Speed: " .. (Features.BoatSpeed and "BẬT" or "TẮT")
+end)
+
+task.spawn(function()
+    while ScriptRunning do
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                local seat = char.Humanoid.SeatPart
+                if seat and seat:IsA("VehicleSeat") then
+                    local bv = seat:FindFirstChild("SmoothBoatVelocity")
+                    if Features.BoatSpeed then
+                        if not bv then
+                            bv = Instance.new("BodyVelocity")
+                            bv.Name = "SmoothBoatVelocity"
+                            bv.MaxForce = Vector3.new(1e5, 0, 1e5)
+                            bv.Parent = seat
+                        end
+                        bv.Velocity = seat.CFrame.LookVector * (seat.Throttle * Config.BoatSpeed)
+                    else
+                        if bv then bv:Destroy() end
+                    end
+                end
+            end
+        end)
+        task.wait(0.1)
+    end
+end)
+
+-- ===== AUTO TP GHẾ KHI MẤT MÁU =====
+
+local IsTeleported = false
+task.spawn(function()
+    while ScriptRunning do
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                local humanoid = char.Humanoid
+                if humanoid.Health >= humanoid.MaxHealth then 
+                    IsTeleported = false 
+                end
+                
+                if humanoid.Health < humanoid.MaxHealth and humanoid.Health > 0 and not IsTeleported then
+                    IsTeleported = true
+                    local rootPart = char:FindFirstChild("HumanoidRootPart")
+                    if rootPart then
+                        local rootPos = rootPart.Position
+                        local nearestSeat = nil
+                        local shortestDist = math.huge
+                        
+                        for _, obj in pairs(Workspace:GetDescendants()) do
+                            if obj:IsA("Seat") or obj:IsA("VehicleSeat") then
+                                local dist = (rootPos - obj.Position).Magnitude
+                                if dist < 300 and dist < shortestDist then
+                                    shortestDist = dist
+                                    nearestSeat = obj
+                                end
+                            end
+                        end
+                        if nearestSeat then 
+                            rootPart.CFrame = nearestSeat.CFrame + Vector3.new(0, 3, 0)
+                        end
+                    end
+                end
+            end
+        end)
+        task.wait(0.5)
+    end
+end)
+
+print("Strawberry Hub đã tải thành công!")
