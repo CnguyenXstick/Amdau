@@ -5,11 +5,18 @@ local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 
--- Hàm hỗ trợ Kéo Thả Mượt Cả Trên PC & Mobile
-local function MakeDraggable(gui)
-    local dragging = false
-    local dragInput, dragStart, startPos
+-- Biến quản lý trạng thái
+local scriptRunning = true
+local flyOn, collectOn, espOn, noclipOn, brightOn = false, false, false, false, false
+local tpwalking = false
 
+-- Lưu trạng thái Lighting ban đầu để Restore
+local defaultAmbient = Lighting.Ambient
+local defaultOutdoor = Lighting.OutdoorAmbient
+
+-- Hàm Kéo Thả
+local function MakeDraggable(gui)
+    local dragging, dragInput, dragStart, startPos
     local function update(input)
         local delta = input.Position - dragStart
         gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
@@ -20,11 +27,8 @@ local function MakeDraggable(gui)
             dragging = true
             dragStart = input.Position
             startPos = gui.Position
-
             input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
             end)
         end
     end)
@@ -36,13 +40,11 @@ local function MakeDraggable(gui)
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
+        if input == dragInput and dragging then update(input) end
     end)
 end
 
--- UI Strawberry Hub
+-- UI Setup
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Name = "StrawberryHub"
@@ -51,23 +53,20 @@ MainFrame.Position = UDim2.new(0.5, -110, 0.5, -135)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BackgroundTransparency = 0.3
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
-
--- Bật kéo thả cho MainFrame
 MakeDraggable(MainFrame)
 
--- Viền 7 màu MainFrame
 local UIStroke = Instance.new("UIStroke", MainFrame)
 UIStroke.Thickness = 2
 task.spawn(function()
-    while true do
+    while scriptRunning do
         for i = 0, 1, 0.05 do 
+            if not scriptRunning then break end
             UIStroke.Color = Color3.fromHSV(i, 1, 1)
             task.wait(0.1) 
         end
     end
 end)
 
--- Tiêu đề
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Text = "Strawberry / LostCurrents - by nguyen"
 Title.Size = UDim2.new(0, 140, 0, 25)
@@ -78,7 +77,6 @@ Title.TextSize = 9
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Nút Ẩn (-) và Xóa (X)
 local HideBtn = Instance.new("TextButton", MainFrame)
 HideBtn.Text = "-"
 HideBtn.Size = UDim2.new(0, 22, 0, 22)
@@ -94,9 +92,7 @@ CloseBtn.Position = UDim2.new(0.86, 0, 0.02, 0)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 CloseBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
-CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
--- Floating Logo Button
 local FloatBtn = Instance.new("ImageButton", ScreenGui)
 FloatBtn.Name = "OpenButton"
 FloatBtn.Size = UDim2.new(0, 45, 0, 45)
@@ -106,15 +102,14 @@ FloatBtn.BackgroundTransparency = 0.3
 FloatBtn.Image = "rbxassetid://88285387138547"
 FloatBtn.Visible = false
 Instance.new("UICorner", FloatBtn).CornerRadius = UDim.new(1, 0)
-
--- Bật kéo thả cho Logo Thu Nhỏ
 MakeDraggable(FloatBtn)
 
 local FloatStroke = Instance.new("UIStroke", FloatBtn)
 FloatStroke.Thickness = 2
 task.spawn(function()
-    while true do
+    while scriptRunning do
         for i = 0, 1, 0.05 do 
+            if not scriptRunning then break end
             FloatStroke.Color = Color3.fromHSV(i, 1, 1)
             task.wait(0.1) 
         end
@@ -124,7 +119,7 @@ end)
 HideBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; FloatBtn.Visible = true end)
 FloatBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatBtn.Visible = false end)
 
--- Khung Nút Chuyển Tab (Main / Misc)
+-- Tab Main & Misc
 local TabMainBtn = Instance.new("TextButton", MainFrame)
 TabMainBtn.Text = "Main"
 TabMainBtn.Size = UDim2.new(0.44, 0, 0, 22)
@@ -141,7 +136,6 @@ TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 Instance.new("UICorner", TabMiscBtn).CornerRadius = UDim.new(0, 4)
 
--- Container chứa nội dung Tab
 local MainContainer = Instance.new("Frame", MainFrame)
 MainContainer.Size = UDim2.new(0.92, 0, 0.82, 0)
 MainContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
@@ -153,26 +147,18 @@ MiscContainer.Position = UDim2.new(0.04, 0, 0.18, 0)
 MiscContainer.BackgroundTransparency = 1
 MiscContainer.Visible = false
 
--- Chuyển Tab
 TabMainBtn.MouseButton1Click:Connect(function()
-    MainContainer.Visible = true
-    MiscContainer.Visible = false
-    TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
-    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    MainContainer.Visible = true; MiscContainer.Visible = false
+    TabMainBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60); TabMainBtn.TextColor3 = Color3.new(1, 1, 1)
+    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMiscBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 end)
 
 TabMiscBtn.MouseButton1Click:Connect(function()
-    MainContainer.Visible = false
-    MiscContainer.Visible = true
-    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    TabMiscBtn.TextColor3 = Color3.new(1, 1, 1)
-    TabMainBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    TabMainBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    MainContainer.Visible = false; MiscContainer.Visible = true
+    TabMiscBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60); TabMiscBtn.TextColor3 = Color3.new(1, 1, 1)
+    TabMainBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TabMainBtn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
 end)
 
--- Hàm tạo nút bấm
 local function CreateButton(text, y, parent)
     local b = Instance.new("TextButton", parent)
     b.Text = text
@@ -184,7 +170,6 @@ local function CreateButton(text, y, parent)
     return b
 end
 
--- TAB MAIN
 local SpeedInput = Instance.new("TextBox", MainContainer)
 SpeedInput.PlaceholderText = "Speed (Mặc định 1)"
 SpeedInput.Size = UDim2.new(1, 0, 0, 25)
@@ -196,69 +181,82 @@ Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 4)
 local FlyBtn = CreateButton("Fly: OFF", 0.18, MainContainer)
 local CollectBtn = CreateButton("Auto Lụm: OFF", 0.36, MainContainer)
 local ESPBtn = CreateButton("ESP: OFF", 0.54, MainContainer)
-
--- TAB MISC
 local BrightBtn = CreateButton("Full Bright: OFF", 0, MiscContainer)
 local NoclipBtn = CreateButton("Noclip: OFF", 0.18, MiscContainer)
 
--- Trạng thái tính năng
-local flyOn, collectOn, espOn, noclipOn, brightOn = false, false, false, false, false
-local tpwalking = false
+-- HÀM DỌN SẠCH TOÀN BỘ (SỰ KIỆN NÚT X)
+local function CleanupAll()
+    scriptRunning = false
+    flyOn = false
+    collectOn = false
+    espOn = false
+    noclipOn = false
+    brightOn = false
+    tpwalking = false
 
--- LOGIC FLY V3 DÙNG CFRAME & BODYGYRO
+    -- Reset Lighting
+    Lighting.Ambient = defaultAmbient
+    Lighting.OutdoorAmbient = defaultOutdoor
+
+    -- Reset Nhân vật
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.PlatformStand = false
+            for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
+                hum:SetStateEnabled(state, true)
+            end
+            hum:ChangeState(Enum.HumanoidStateType.Running)
+        end
+        if char:FindFirstChild("Animate") then
+            char.Animate.Disabled = false
+        end
+    end
+
+    -- Xóa sạch ESP UI trong Workspace
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight:Destroy() end
+        if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui:Destroy() end
+    end
+
+    -- Xóa UI
+    ScreenGui:Destroy()
+end
+
+CloseBtn.MouseButton1Click:Connect(CleanupAll)
+
+-- LOGIC FLY V3
 task.spawn(function()
-    while true do
+    while scriptRunning do
         task.wait(0.1)
-        if flyOn then
+        if flyOn and scriptRunning then
             local char = LocalPlayer.Character
             if not char then continue end
             local hum = char:FindFirstChildOfClass("Humanoid")
             local root = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
             if not hum or not root then continue end
 
-            -- Vô hiệu hóa Animation
-            if char:FindFirstChild("Animate") then
-                char.Animate.Disabled = true
-            end
-            for _, track in pairs(hum:GetPlayingAnimationTracks()) do
-                track:AdjustSpeed(0)
-            end
+            if char:FindFirstChild("Animate") then char.Animate.Disabled = true end
+            for _, track in pairs(hum:GetPlayingAnimationTracks()) do track:AdjustSpeed(0) end
 
-            -- Chuyển State Humanoid
-            hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Flying, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Landed, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Running, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+            for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
+                hum:SetStateEnabled(state, false)
+            end
+            hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
             hum:ChangeState(Enum.HumanoidStateType.Swimming)
-
             hum.PlatformStand = true
 
-            -- Body Velocity & Gyro
             local bg = Instance.new("BodyGyro", root)
-            bg.P = 9e4
-            bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-            bg.cframe = root.CFrame
+            bg.P = 9e4; bg.maxTorque = Vector3.new(9e9, 9e9, 9e9); bg.cframe = root.CFrame
 
             local bv = Instance.new("BodyVelocity", root)
-            bv.velocity = Vector3.new(0, 0.1, 0)
-            bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+            bv.velocity = Vector3.new(0, 0.1, 0); bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
 
-            -- Vòng lặp di chuyển CFrame TranslateBy
             tpwalking = true
             task.spawn(function()
                 local hb = RunService.Heartbeat
-                while tpwalking and flyOn and char and hum and hum.Parent do
+                while tpwalking and flyOn and scriptRunning and char and hum and hum.Parent do
                     hb:Wait()
                     if hum.MoveDirection.Magnitude > 0 then
                         local multiplier = tonumber(SpeedInput.Text) or 1
@@ -269,36 +267,19 @@ task.spawn(function()
                 end
             end)
 
-            while flyOn and hum.Health > 0 do
+            while flyOn and scriptRunning and hum.Health > 0 do
                 RunService.RenderStepped:Wait()
                 bg.cframe = Workspace.CurrentCamera.CFrame
             end
 
-            -- Reset trạng thái khi tắt Fly
             tpwalking = false
-            bg:Destroy()
-            bv:Destroy()
+            bg:Destroy(); bv:Destroy()
             hum.PlatformStand = false
-            if char:FindFirstChild("Animate") then
-                char.Animate.Disabled = false
+            if char:FindFirstChild("Animate") then char.Animate.Disabled = false end
+            for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
+                hum:SetStateEnabled(state, true)
             end
-
-            hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Flying, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Landed, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Running, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, true)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
-            hum:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+            hum:ChangeState(Enum.HumanoidStateType.Running)
         end
     end
 end)
@@ -316,12 +297,8 @@ ESPBtn.MouseButton1Click:Connect(function()
     ESPBtn.Text = "ESP: "..(espOn and "ON" or "OFF")
     if not espOn then
         for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:FindFirstChild("ESPHighlight") then
-                obj.ESPHighlight.Enabled = false
-            end
-            if obj:FindFirstChild("ESPTextGui") then
-                obj.ESPTextGui.Enabled = false
-            end
+            if obj:FindFirstChild("ESPHighlight") then obj.ESPHighlight.Enabled = false end
+            if obj:FindFirstChild("ESPTextGui") then obj.ESPTextGui.Enabled = false end
         end
     end
 end)
@@ -333,99 +310,97 @@ BrightBtn.MouseButton1Click:Connect(function()
         Lighting.Ambient = Color3.new(1, 1, 1)
         Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
     else
-        Lighting.Ambient = Color3.fromRGB(127, 127, 127)
-        Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
+        Lighting.Ambient = defaultAmbient
+        Lighting.OutdoorAmbient = defaultOutdoor
     end
 end)
 
--- XỬ LÝ NOCLIP
+-- NOCLIP (Tối ưu chỉ chạy khi Bật)
 RunService.Stepped:Connect(function()
-    if noclipOn then
+    if noclipOn and scriptRunning then
         local char = LocalPlayer.Character
         if char then
             for _, child in pairs(char:GetChildren()) do
-                if child:IsA("BasePart") then
-                    child.CanCollide = false
-                end
+                if child:IsA("BasePart") then child.CanCollide = false end
             end
         end
     end
 end)
 
--- ESP HIỂN THỊ KHOẢNG CÁCH + AUTO LỤM
+-- ESP + AUTO LỤM (Tối ưu quét để giảm Lag)
 task.spawn(function()
-    while true do
-        pcall(function()
-            local char = LocalPlayer.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-            local rootPos = char.HumanoidRootPart.Position
-            
-            for _, obj in pairs(Workspace:GetDescendants()) do
-                if obj:IsA("BasePart") then
-                    local isTarget = (obj.Name == "La bàn" or obj.Name == "Scrap" or obj.Name == "Gold" or obj.Name == "Chest")
-                    local dist = (rootPos - obj.Position).Magnitude
-                    
-                    -- ESP Viền + Chữ Khoảng Cách
-                    if isTarget and espOn then
-                        local hl = obj:FindFirstChild("ESPHighlight")
-                        if not hl then
-                            hl = Instance.new("Highlight")
-                            hl.Name = "ESPHighlight"
-                            hl.FillColor = Color3.fromRGB(255, 0, 0)
-                            hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-                            hl.Parent = obj
-                        end
-                        hl.Enabled = true
+    while scriptRunning do
+        if espOn or collectOn then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPos = char.HumanoidRootPart.Position
+                
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    if not scriptRunning then break end
+                    if obj:IsA("BasePart") then
+                        local isTarget = (obj.Name == "La bàn" or obj.Name == "Scrap" or obj.Name == "Gold" or obj.Name == "Chest")
+                        local dist = (rootPos - obj.Position).Magnitude
                         
-                        local bgui = obj:FindFirstChild("ESPTextGui")
-                        if not bgui then
-                            bgui = Instance.new("BillboardGui")
-                            bgui.Name = "ESPTextGui"
-                            bgui.Size = UDim2.new(0, 150, 0, 30)
-                            bgui.AlwaysOnTop = true
-                            bgui.ExtentsOffset = Vector3.new(0, 2, 0)
-                            bgui.Parent = obj
-                            
-                            local textLabel = Instance.new("TextLabel", bgui)
-                            textLabel.Name = "ESPLabel"
-                            textLabel.Size = UDim2.new(1, 0, 1, 0)
-                            textLabel.BackgroundTransparency = 1
-                            textLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-                            textLabel.TextStrokeTransparency = 0
-                            textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                            textLabel.TextSize = 11
-                            textLabel.Font = Enum.Font.GothamBold
-                        end
-                        bgui.Enabled = true
-                        bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
-                    end
-                    
-                    -- Auto Lụm khi tới gần
-                    if collectOn then
-                        local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
-                        if prompt then
-                            local parentPart = prompt.Parent:IsA("BasePart") and prompt.Parent or obj
-                            local promptDist = (rootPos - parentPart.Position).Magnitude
-                            
-                            if promptDist <= 15 then
-                                prompt.HoldDuration = 0
-                                fireproximityprompt(prompt)
+                        -- ESP
+                        if isTarget and espOn then
+                            local hl = obj:FindFirstChild("ESPHighlight")
+                            if not hl then
+                                hl = Instance.new("Highlight")
+                                hl.Name = "ESPHighlight"
+                                hl.FillColor = Color3.fromRGB(255, 0, 0)
+                                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                                hl.Parent = obj
                             end
-                        elseif isTarget and dist <= 15 then
-                            obj.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 1, 0)
+                            hl.Enabled = true
+                            
+                            local bgui = obj:FindFirstChild("ESPTextGui")
+                            if not bgui then
+                                bgui = Instance.new("BillboardGui")
+                                bgui.Name = "ESPTextGui"
+                                bgui.Size = UDim2.new(0, 150, 0, 30)
+                                bgui.AlwaysOnTop = true
+                                bgui.ExtentsOffset = Vector3.new(0, 2, 0)
+                                bgui.Parent = obj
+                                
+                                local textLabel = Instance.new("TextLabel", bgui)
+                                textLabel.Name = "ESPLabel"
+                                textLabel.Size = UDim2.new(1, 0, 1, 0)
+                                textLabel.BackgroundTransparency = 1
+                                textLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                                textLabel.TextStrokeTransparency = 0
+                                textLabel.TextSize = 11
+                                textLabel.Font = Enum.Font.GothamBold
+                            end
+                            bgui.Enabled = true
+                            bgui.ESPLabel.Text = string.format("%s [%dm]", obj.Name, math.floor(dist))
+                        end
+                        
+                        -- Auto Lụm
+                        if collectOn then
+                            local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                            if prompt then
+                                local parentPart = prompt.Parent:IsA("BasePart") and prompt.Parent or obj
+                                if (rootPos - parentPart.Position).Magnitude <= 15 then
+                                    prompt.HoldDuration = 0
+                                    fireproximityprompt(prompt)
+                                end
+                            elseif isTarget and dist <= 15 then
+                                obj.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 1, 0)
+                            end
                         end
                     end
                 end
-            end
-        end)
-        task.wait(0.1)
+            end)
+        end
+        task.wait(0.2) -- Tăng thời gian chờ lên 0.2s để giảm tải cho CPU
     end
 end)
 
--- Auto TP lên ghế (Sát thương 1 lần)
+-- Auto TP Ghế khi mất máu
 local isTeleported = false
 task.spawn(function()
-    while true do
+    while scriptRunning do
         pcall(function()
             local char = LocalPlayer.Character
             if char and char:FindFirstChildOfClass("Humanoid") then
@@ -449,12 +424,11 @@ task.spawn(function()
                                 end
                             end
                         end
-                        
                         if nearestSeat then rootPart.CFrame = nearestSeat.CFrame + Vector3.new(0, 3, 0) end
                     end
                 end
             end
         end)
-        task.wait(0.1)
+        task.wait(0.3)
     end
 end)
