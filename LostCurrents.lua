@@ -20,7 +20,6 @@ local boatSpeedOn = false
 local boatSpeedValue = 150
 
 local noFuelBoatOn = false
-local boatStepSpeed = 3
 
 local defaultAmbient = Lighting.Ambient
 local defaultOutdoor = Lighting.OutdoorAmbient
@@ -33,7 +32,7 @@ local LootNames = {
 }
 
 -- ========================================================
--- BẢO VỆ 1: HOOK CHẶN REMOTEEVENT TRỪ NHIÊN LIỆU (AUTO-RUN)
+-- HOOK CHẶN REMOTEEVENT & CHẶN TRỪ NHIÊN LIỆU (AUTO-RUN)
 -- ========================================================
 pcall(function()
     local rawmetatable = getrawmetatable(game)
@@ -44,8 +43,7 @@ pcall(function()
         local method = getnamecallmethod()
         if method == "FireServer" and self then
             local name = string.lower(self.Name)
-            -- Chặn tất cả Remote gửi dữ liệu hao nhiên liệu
-            if name:find("fuel") or name:find("gas") or name:find("consume") or name:find("xang") or name:find("drain") then
+            if name:find("fuel") or name:find("gas") or name:find("consume") or name:find("xang") or name:find("drain") or name:find("use") then
                 return nil 
             end
         end
@@ -289,8 +287,8 @@ Instance.new("UICorner", BoatInput).CornerRadius = UDim.new(0, 4)
 
 local BoatSpeedBtn = CreateButton("Boat Speed: OFF", 0.65, MiscContainer, 0.48, 0.52)
 
--- No-Fuel Drive
-local NoFuelBtn = CreateButton("Lái Không Mất Xăng: OFF", 0.78, MiscContainer, 1, 0)
+-- Infinite Fuel
+local NoFuelBtn = CreateButton("Băng Nhiên Liệu (No-Fuel): OFF", 0.78, MiscContainer, 1, 0)
 
 -- Cập nhật thông số từ TextBox
 SpeedInput.FocusLost:Connect(function() local v = tonumber(SpeedInput.Text); if v then speedValue = v else SpeedInput.Text = tostring(speedValue) end end)
@@ -321,7 +319,7 @@ end)
 
 NoFuelBtn.MouseButton1Click:Connect(function()
     noFuelBoatOn = not noFuelBoatOn
-    NoFuelBtn.Text = "Lái Không Mất Xăng: "..(noFuelBoatOn and "ON" or "OFF")
+    NoFuelBtn.Text = "Băng Nhiên Liệu (No-Fuel): "..(noFuelBoatOn and "ON" or "OFF")
 end)
 
 -- TAB TELEPORT
@@ -728,7 +726,7 @@ task.spawn(function()
     end
 end)
 
--- Loop 1: Tốc độ thuyền vật lý (BodyVelocity)
+-- Loop 1: Tốc độ thuyền vật lý chính xác (Không gây giật lùi/Rubberband)
 task.spawn(function() 
     while scriptRunning do 
         pcall(function() 
@@ -736,15 +734,17 @@ task.spawn(function()
             if char and char:FindFirstChild("Humanoid") then 
                 local seat = char.Humanoid.SeatPart 
                 if seat and seat:IsA("VehicleSeat") then 
-                    local bv = seat:FindFirstChild("BoatSpeedBV")
-                    if boatSpeedOn and not noFuelBoatOn then
+                    local bv = seat:FindFirstChild("SmoothBoatVelocity")
+                    if boatSpeedOn then
                         if not bv then
                             bv = Instance.new("BodyVelocity")
-                            bv.Name = "BoatSpeedBV"
-                            bv.MaxForce = Vector3.new(9e5, 0, 9e5)
+                            bv.Name = "SmoothBoatVelocity"
+                            bv.MaxForce = Vector3.new(1e6, 0, 1e6)
+                            bv.Velocity = Vector3.new(0, 0, 0)
                             bv.Parent = seat
                         end
                         seat.MaxSpeed = boatSpeedValue
+                        
                         if seat.Throttle ~= 0 then 
                             bv.Velocity = seat.CFrame.LookVector * (seat.Throttle * boatSpeedValue)
                         else
@@ -756,7 +756,7 @@ task.spawn(function()
                 end 
             end 
         end) 
-        task.wait(0.05) 
+        task.wait(0.03) 
     end 
 end) 
 
@@ -779,7 +779,7 @@ task.spawn(function()
     end 
 end)
 
--- BẢO VỆ 2: DI CHUYỂN BẰNG CFRAME (LÁI KHÔNG MẤT XĂNG)
+-- Loop 3: Đóng băng thuộc tính Xăng (Freeze Fuel Value) trực tiếp trên Model Thuyền
 task.spawn(function()
     while scriptRunning do
         if noFuelBoatOn then
@@ -790,21 +790,19 @@ task.spawn(function()
                     if seat and seat:IsA("VehicleSeat") then
                         local boatModel = seat:FindFirstAncestorOfClass("Model") or seat
                         
-                        -- Di chuyển tiến / lùi
-                        if seat.Throttle > 0 then
-                            boatModel:PivotTo(boatModel:GetPivot() + (seat.CFrame.LookVector * (boatStepSpeed * (boatSpeedValue / 50))))
-                        elseif seat.Throttle < 0 then
-                            boatModel:PivotTo(boatModel:GetPivot() - (seat.CFrame.LookVector * (boatStepSpeed * (boatSpeedValue / 50))))
-                        end
-                        
-                        -- Xoay hướng
-                        if seat.Steer ~= 0 then
-                            boatModel:PivotTo(boatModel:GetPivot() * CFrame.Angles(0, math.rad(-seat.Steer * 3), 0))
+                        -- Quét tìm thuộc tính Nhiên liệu/Gas/Fuel trong thuyền và giữ nguyên giá trị tối đa
+                        for _, val in pairs(boatModel:GetDescendants()) do
+                            if val:IsA("NumberValue") or val:IsA("IntValue") then
+                                local name = string.lower(val.Name)
+                                if name:find("fuel") or name:find("gas") or name:find("xang") or name:find("energy") then
+                                    val.Value = 100 -- Liên tục khóa giá trị về mức đầy
+                                end
+                            end
                         end
                     end
                 end
             end)
         end
-        task.wait(0.03)
+        task.wait(0.2)
     end
 end)
