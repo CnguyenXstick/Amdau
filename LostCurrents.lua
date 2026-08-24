@@ -1,5 +1,5 @@
 -- [[ Strawberry Hub - LostCurrents ]]
--- Phiên bản: 1.3 (RGB Borders + Dual Custom TP Mode + Anti-Lag)
+-- Phiên bản: 1.4 (Fixed Boat TP Rubberband + Manual Equip KillAura)
 -- Tác giả: nguyen
 
 -- ===== DỊCH VỤ =====
@@ -318,7 +318,7 @@ local BoatInput = CreateTextBox("Tốc độ thuyền", tostring(Config.BoatSpee
 local BoatSpeedBtn = CreateButton("Boat Speed: TẮT", 0.65, MiscContainer, 0.48, 0.52)
 local NoFuelBtn = CreateButton("Băng Nhiên Liệu: TẮT", 0.78, MiscContainer, 1, 0)
 
--- TAB TELEPORT (ĐÃ CẬP NHẬT 2 NÚT TỎA ĐỘ)
+-- TAB TELEPORT
 local SaveTPBtn = CreateButton("Lưu Vị Trí Hiện Tại", 0, TPContainer, 0.48, 0)
 local LoadTPBtn = CreateButton("TP Đến Vị Trí Đã Lưu", 0, TPContainer, 0.48, 0.52)
 local SpecificTPBtn = CreateButton("TP Cố Định (1230, 220, 60)", 0.14, TPContainer, 1, 0)
@@ -436,7 +436,7 @@ CustomPlayerTPBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- NÚT 2: LÁI THUYỀN ĐẾN TỌA ĐỘ (Dịch chuyển cả thuyền)
+-- NÚT 2: LÁI THUYỀN ĐẾN TỌA ĐỘ (CHỐNG GIẬT RUBBERBAND)
 CustomBoatTPBtn.MouseButton1Click:Connect(function()
     local text = CustomTPInput.Text
     local coords = {}
@@ -449,8 +449,35 @@ CustomBoatTPBtn.MouseButton1Click:Connect(function()
             if seat then
                 local boat = seat.Parent
                 local root = (boat and boat:IsA("Model") and boat.PrimaryPart) or seat or (boat and boat:FindFirstChildWhichIsA("BasePart"))
+                
                 if root then
-                    root.CFrame = CFrame.new(coords[1], coords[2], coords[3])
+                    local targetCFrame = CFrame.new(coords[1], coords[2], coords[3])
+                    
+                    -- Triệt tiêu vận tốc cũ tránh bị kéo lại
+                    pcall(function()
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                    end)
+                    
+                    -- Anchor tạm thời để khóa vị trí trên Server
+                    root.Anchored = true
+                    
+                    -- Dịch chuyển toàn bộ Model thuyền
+                    if boat and boat:IsA("Model") then
+                        boat:PivotTo(targetCFrame)
+                    else
+                        root.CFrame = targetCFrame
+                    end
+                    
+                    -- Chờ 0.15 giây cho Server ghi nhận rồi nhả Anchor
+                    task.wait(0.15)
+                    root.Anchored = false
+                    
+                    -- Triệt tiêu vận tốc dư thừa một lần nữa
+                    pcall(function()
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                    end)
                 end
             else
                 CustomBoatTPBtn.Text = "Chưa Ngồi Thuyền!"
@@ -672,7 +699,7 @@ task.spawn(function()
     end
 end)
 
--- KILL AURA
+-- KILL AURA (KHÔNG TỰ ĐỘNG CẦM VŨ KHÍ)
 KillAuraBtn.MouseButton1Click:Connect(function()
     Features.KillAura = not Features.KillAura
     KillAuraBtn.Text = "Kill Aura: " .. (Features.KillAura and "BẬT" or "TẮT")
@@ -686,19 +713,20 @@ task.spawn(function()
                 if not char then return end
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if not root then return end
-                
-                local rootPos = root.Position
-                local maxDist = tonumber(KillDistInput.Text) or 25
+
                 local tool = char:FindFirstChildOfClass("Tool")
-                
                 if tool then
-                    for _, model in pairs(Workspace:GetChildren()) do
-                        if model:IsA("Model") and model ~= char then
-                            local hum = model:FindFirstChildOfClass("Humanoid")
-                            if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(model) then
-                                local npcRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
+                    local rootPos = root.Position
+                    local maxDist = tonumber(KillDistInput.Text) or 25
+                    
+                    for _, obj in pairs(Workspace:GetDescendants()) do
+                        if obj:IsA("Humanoid") and obj.Parent ~= char and obj.Health > 0 then
+                            local model = obj.Parent
+                            if model:IsA("Model") and not Players:GetPlayerFromCharacter(model) then
+                                local npcRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
                                 if npcRoot and (rootPos - npcRoot.Position).Magnitude <= maxDist then
                                     tool:Activate()
+                                    
                                     local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
                                     if handle and firetouchinterest then
                                         firetouchinterest(handle, npcRoot, 0)
@@ -711,7 +739,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.15)
+        task.wait(0.1)
     end
 end)
 
@@ -876,4 +904,4 @@ task.spawn(function()
 end)
 
 ShowUI()
-print("Strawberry Hub v1.3 - Dual Custom TP Modes Ready!")
+print("Strawberry Hub v1.4 - Con cu!")
